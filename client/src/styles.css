@@ -1,0 +1,140 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: "Gilroy";
+  src: url("/fonts/Gilroy-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gilroy";
+  src: url("/fonts/Gilroy-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gilroy";
+  src: url("/fonts/Gilroy-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gilroy";
+  src: url("/fonts/Gilroy-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gilroy";
+  src: url("/fonts/Gilroy-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Gilroy";
+  src: url("/fonts/Gilroy-Heavy.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-deep: var(--brand-blue-deep);
+  --color-brand-green: var(--brand-green);
+  --color-brand-green-soft: var(--brand-green-soft);
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-slate: var(--brand-slate);
+  --color-hero-bg: var(--hero-bg);
+  --color-section-muted: var(--section-muted);
+  --font-sans: "Gilroy", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Gilroy", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  /* Figma: cards/buttons use 12px radius */
+  --radius: 12px;
+
+  /* Figma SuMos brand tokens (locked to exact hex from Figma variables) */
+  --brand-blue: #518efa;          /* SuMos/blue/100 */
+  --brand-slate: #455369;         /* SuMos/blue/200 */
+  --brand-blue-deep: #233662;     /* SuMos/blue/300 */
+  --brand-navy: #233662;
+  --brand-green: #64a550;         /* SuMos/green/300 */
+  --brand-green-soft: #b6d989;    /* SuMos/green/200 */
+  --brand-gray-50: #ffffff;       /* SuMos/gray/50 */
+  --brand-gray-100: #e5e7eb;      /* SuMos/gray/100 */
+  --brand-gray-200: #bfbfbf;      /* SuMos/gray/200 */
+  --brand-gray-300: #444444;      /* SuMos/gray/300 */
+
+  --background: #ffffff;
+  --foreground: #233662;
+  --card: #ffffff;
+  --card-foreground: #233662;
+  --popover: #ffffff;
+  --popover-foreground: #233662;
+
+  --primary: #518efa;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f3f4f6;
+  --secondary-foreground: #233662;
+  --muted: #f8f9fb;
+  --muted-foreground: #455369;
+  --accent: #f3f4f6;
+  --accent-foreground: #233662;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #518efa;
+
+  --hero-bg: #eef3fc;
+  --section-muted: #f4f5f7;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(35 54 98 / 0.10);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html { font-family: var(--font-sans); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+}
