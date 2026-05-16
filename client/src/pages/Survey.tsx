@@ -449,10 +449,12 @@ export default function SurveyPage() {
                       title={item.q.text}
                       className={cn(
                         "aspect-square rounded text-[9px] sm:text-[10px] font-bold transition-all flex items-center justify-center border",
-                        item.isAnswered 
-                          ? "bg-[#64A550] text-white border-[#64A550] shadow-sm" 
+                        item.isAnswered
+                          ? "bg-[#64A550] text-white border-[#64A550] shadow-sm"
                           : "bg-white text-yellow-950 border-[#64A550] shadow-sm",
-                        item.gIdx === groupIdx && item.sIdx === subIdx && "ring-2 ring-primary ring-offset-2"
+                        item.gIdx === groupIdx &&
+                          item.sIdx === subIdx &&
+                          "ring-2 ring-primary ring-offset-2",
                       )}
                     >
                       {item.num}
@@ -602,7 +604,7 @@ export default function SurveyPage() {
 
                         {/* Bottom nav */}
                         <div className="space-y-3 pt-2">
-                          <div className="flex justify-end">
+                          {/*<div className="flex justify-end">
                             <Button
                               type="button"
                               variant="outline"
@@ -612,7 +614,7 @@ export default function SurveyPage() {
                             >
                               🎲 Fill with random answers (dev)
                             </Button>
-                          </div>
+                          </div>*/}
                           <div className="flex items-center justify-between">
                             <Button
                               variant="outline"
