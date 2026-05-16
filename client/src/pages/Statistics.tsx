@@ -185,8 +185,9 @@ function StatisticsPage() {
       <StatisticsOverview data={dashboardData} isLoading={isLoading} />
 
       <section className="bg-[#f5f5f5] py-10 pb-20">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-10 px-6 sm:px-10 lg:px-[160px] lg:flex-row lg:items-stretch">
-          <SustainableBehaviour averages={dashboardData?.averages} />
+        // !!! hidden !!!
+        <div className="hidden mx-auto flex max-w-[1440px] flex-col gap-10 px-6 sm:px-10 lg:px-[160px] lg:flex-row lg:items-stretch">
+          <SustainableBehaviour averages={dashboardData?.averages}  />
           <SustainableHabits />
         </div>
       </section>

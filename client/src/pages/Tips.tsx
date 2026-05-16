@@ -5,42 +5,40 @@ import { Institutions } from "@/components/sumos/Institutions";
 import sumosWordmark from "@/assets/sumos-wordmark.png";
 import tipTravel from "@/assets/tip-travel.jpg";
 import tipHome from "@/assets/tip-home.jpg";
-import tipEngage from "@/assets/tip-engage.jpg";
+import tipDevice from "@/assets/tip-device.jpg";
+
+type TipItem = string | { bold: string } | {link:string, url:string};
 
 
 type Tip = {
   image: string;
   title: string;
-  items: Array<Array<string | { bold: string }>>;
+  items: Array<Array<TipItem>>;
 };
 
 const tips: Tip[] = [
   {
     image: tipTravel,
-    title: "Practice ways to reduce your carbon footprint while traveling:",
+    title: "Practice ways to reduce your impact while traveling:",
     items: [
-      ["Prefer ", { bold: "train, bus, or carpool" }, " instead of short flights."],
-      ["If flying, ", { bold: "choose direct flights" }, " (less emissions than connecting flights)."],
-      [{ bold: "Combine transport modes" }, " — e.g., train + bike or public transit."],
-      [{ bold: "Walk or cycle" }, " for short distances."],
-    ],
+      ["Even if you make sustainable choices every day, just one or two flights a year can seriously increase your environmental footprint."],
+      ["Curious how much travel matters compared to your daily habits? See how flights compare using the ", {link: "European Environment Agency overview on transport emissions", url: "https://www.eea.europa.eu/en/topics/in-depth/transport-and-mobility"},"."],
+      ["Explore a simple personal impact comparison with a flight calculator from the ", {link:"International Civil Aviation Organization", url: "https://www.icao.int/environmental-protection/environmental-tools/icec"},"."]]
   },
   {
     image: tipHome,
-    title: "Choose greener choices at home and accommodations:",
+    title: "Choose greener choices at home:",
     items: [
-      ["Take ", { bold: "shorter showers" }, " and turn off taps when not in use."],
-      ["Turn ", { bold: "off lights, chargers, and electronics" }, " when not needed."],
-      [{ bold: "Separate waste" }, " in your home or accommodations."],
-    ],
+      ["Small changes in how often and how you wash clothes can save water, energy, and time. Wear clothes more than once when possible - many items don't need washing after a single use. Want to know ",{link:"more", url:"https://www.nationalgeographic.com/environment/article/partner-content-laundry-lightening-the-load"},"? "],
+      ["Staying warm does not always mean turning the heating up. Lower your room temperature by 1°C - it can reduce energy use without you really noticing. Here’s the ", {link:"proof",url:"https://www.wwf.org.uk/challenges/turn-down-one-degree"},". "]    ],
   },
   {
-    image: tipEngage,
-    title: "Engage and learn about sustainable travel options:",
+    image: tipDevice,
+    title: "Use your devices smarter and greener:",
     items: [
-      ["Visit ", { bold: "Erasmus+ or institutions websites" }, " for guidance on sustainable travel."],
-      [{ bold: "Attend workshops, webinars, or info sessions" }, " on low-carbon transport."],
-      [{ bold: "Read guides or blogs" }, " about eco-friendly travel tips."],
+      ["Use your devices while they still work well instead of upgrading too early and here’s ", { link: "why",url:"https://learninglab.gitlabpages.inria.fr/mooc-impacts-num/mooc-impacts-num-ressources/en/Partie2/Activites/Capsule_Partie2_4_Agir/story.html" }, ""],
+      ["Try and repair small issues (like battery or screen) instead of replacing the whole device. Watch a ", { link: "short video",url:"https://www.youtube.com/watch?v=eyUqqA8wA0A" }, " if you want to know more about this."],
+      ["Use trade-in programs when buying a new device to ",{ link: "recycle", url:"https://www.bbc.co.uk/newsround/68684673" }, " your old one responsibly. "],
     ],
   },
 ];
@@ -89,20 +87,43 @@ function TipsPage() {
                     {tip.title}
                   </h2>
                   <ul className="list-disc space-y-4 pl-6 text-[16px] text-[#444]">
-                    {tip.items.map((parts, idx) => (
-                      <li key={idx} className="leading-normal">
-                        {parts.map((p, j) =>
-                          typeof p === "string" ? (
-                            <span key={j}>{p}</span>
-                          ) : (
-                            <span key={j} className="font-semibold">
-                              {p.bold}
-                            </span>
-                          ),
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+  {tip.items.map((parts, idx) => (
+    <li key={idx} className="leading-normal">
+      {parts.map((p, j) => {
+        // 1. Ako je običan tekst
+        if (typeof p === "string") {
+          return <span key={j}>{p}</span>;
+        }
+
+        // 2. Ako je objekat sa 'bold' tekstom
+        if ("bold" in p) {
+          return (
+            <span key={j} className="font-semibold">
+              {p.bold}
+            </span>
+          );
+        }
+
+        // 3. Ako je objekat sa 'linkom'
+        if ("link" in p) {
+          return (
+            <a
+              key={j}
+              href={p.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#518EFA] underline hover:text-[#233662] transition-colors font-medium"
+            >
+              {p.link}
+            </a>
+          );
+        }
+
+        return null;
+      })}
+    </li>
+  ))}
+</ul>
                 </div>
               </div>
               {i < tips.length - 1 && (
