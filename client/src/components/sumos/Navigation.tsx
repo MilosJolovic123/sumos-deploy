@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import navLogo from "@/assets/nav-logo.png";
+import navLogo from "@/assets/sumosLogo2.png";
 
 const links: { label: string; to: string }[] = [
   { label: "SURVEY", to: "/survey" },
@@ -33,10 +33,11 @@ export function Navigation() {
               <li key={label} className="flex">
                 <a
                   href={to}
-                  className={`flex h-[144px] items-center justify-center whitespace-nowrap px-2 text-center text-[14px] font-medium uppercase transition-colors ${
+                  className={`flex h-[144px] items-center justify-center whitespace-nowrap px-2 text-center text-[16px] font-medium uppercase transition-colors ${
                     isActive
-                      ? "bg-[#233662] px-4 text-white"
-                      : "text-[#233662] hover:text-[#518efa]"
+                      ? "font-weight:900 bg-[#233662] text-white"
+                      : "text-[#233662] hover:bg-[#233662] hover:text-white"
+                      
                   }`}
                 >
                   {label}

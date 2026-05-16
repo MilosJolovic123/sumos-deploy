@@ -455,8 +455,8 @@ export default function SurveyPage() {
                       className={cn(
                         "aspect-square rounded text-[9px] sm:text-[10px] font-bold transition-all flex items-center justify-center border",
                         item.isAnswered 
-                          ? "bg-green-500 text-white border-green-600 shadow-sm" 
-                          : "bg-yellow-400 text-yellow-950 border-yellow-500 shadow-sm",
+                          ? "bg-[#64A550] text-white border-[#64A550] shadow-sm" 
+                          : "bg-white text-yellow-950 border-[#64A550] shadow-sm",
                         item.gIdx === groupIdx && item.sIdx === subIdx && "ring-2 ring-primary ring-offset-2"
                       )}
                     >
@@ -672,7 +672,7 @@ export default function SurveyPage() {
             <div className="px-2 lg:px-8 py-6 max-w-[460px]">
               <DialogHeader>
                 <DialogTitle className="mb-6 text-3xl font-bold text-brand-blue-deep leading-tight text-left">
-                  Before finishing the survey....
+                  Before finishing the survey...
                 </DialogTitle>
                 <DialogDescription className="mb-8 text-base text-muted-foreground leading-relaxed text-left">
                   Please tell us whether you actually completed the survey for
