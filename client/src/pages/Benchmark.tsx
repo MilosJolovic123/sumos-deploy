@@ -196,8 +196,8 @@ function BenchmarkPage() {
               Benchmark with a friend or yourself
             </h2>
             <p className="text-[18px] text-[#444] md:text-[20px]">
-              This option allows user to{" "}
-              <span className="font-semibold">make 1 to 1 benchmark</span> with other respondents.
+              This option allows you to {" "}
+              <span className="font-semibold">make 1 on 1 benchmark</span> with other respondents, using their code.
             </p>
           </div>
 
@@ -238,11 +238,11 @@ function BenchmarkPage() {
               </button>
             </div>
 
-            {/* Ecological footprint card */}
+            {/* Student green score card */}
             <div className="flex flex-1 flex-col gap-8 rounded-[12px] bg-white p-6 shadow-[0_0_10px_0_rgba(94,98,120,0.08)]">
               <div className="flex items-center justify-between">
                 <h3 className="text-[24px] font-semibold text-[#233662]">
-                  Students ecological footprint
+                  Student green score
                 </h3>
                 <span className="grid h-6 w-6 place-items-center rounded-full border border-[#bfbfbf] text-[12px] text-[#bfbfbf]">
                   i
@@ -292,15 +292,17 @@ function BenchmarkPage() {
                       name="Another"
                       dataKey="mate"
                       stroke="#518EFA"
+                      strokeWidth={3}
                       fill="#518EFA"
-                      fillOpacity={0.5}
+                      fillOpacity={0.2}
                     />
                     <Radar
                       name="Me"
                       dataKey="me"
                       stroke="#64A550"
+                      strokeWidth={3}
                       fill="#64A550"
-                      fillOpacity={0.5}
+                      fillOpacity={0.2}
                     />
                   </RadarChart>
                 </ResponsiveContainer>
@@ -338,15 +340,17 @@ function BenchmarkPage() {
                       name="Another"
                       dataKey="mate"
                       stroke="#518EFA"
+                      strokeWidth={3}
                       fill="#518EFA"
-                      fillOpacity={0.5}
+                      fillOpacity={0.2}
                     />
                     <Radar
                       name="Me"
                       dataKey="me"
                       stroke="#64A550"
+                      strokeWidth={3}
                       fill="#64A550"
-                      fillOpacity={0.5}
+                      fillOpacity={0.2}
                     />
                   </RadarChart>
                 </ResponsiveContainer>

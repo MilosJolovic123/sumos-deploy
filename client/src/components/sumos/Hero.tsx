@@ -30,7 +30,7 @@ export function Hero() {
                 The benchmarking tool is part of the Erasmus+ European Commission
                 co-funded Education project{" "}
                 <span className="font-semibold">
-                  &ldquo;Strengthening the Ecosystem for Sustainable Modern Industry&rdquo;
+                  &ldquo;Strengthening the ecosystem for sustainable student mobility&rdquo;
                 </span>{" "}
                 (SuMoS).
               </p>
