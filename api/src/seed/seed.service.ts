@@ -41,7 +41,7 @@ export class SeedService implements OnModuleInit {
           optional: false,
         },
         {
-          key:'demo_country',
+          key: 'demo_country',
           text: 'Please select the country you currently live in:',
           category: 'Demographic data',
           type: 'SINGLE_CHOICE',
@@ -50,7 +50,7 @@ export class SeedService implements OnModuleInit {
         },
         {
           key: 'study_status_university',
-          text: "Please select your home university. If not listed, choose 'Other' and specify",
+          text: "Please select your home university. If not listed, choose 'Other':",
           category: 'Study status data',
           type: 'SINGLE_CHOICE',
           options: [
@@ -63,7 +63,7 @@ export class SeedService implements OnModuleInit {
           ],
           optional: false,
         },
-          {
+        {
           key: 'study_status_study_level',
           text: 'What is your level of study?',
           category: 'Study status data',
