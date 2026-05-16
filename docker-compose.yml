@@ -1,0 +1,100 @@
+# services:
+#   mongodb:
+#     image: mongo:8.0
+#     container_name: sumos-mongo
+#     ports:
+#       - "${MONGO_PORT}:27017" # Spoljni port iz .env : Fiksni interni port 27017
+#     volumes:
+#       - mongo_data:/data/db
+#     restart: unless-stopped
+
+#   api:
+#     build:
+#       context: ./api
+#       dockerfile: Dockerfile
+#     container_name: sumos-api
+#     ports:
+#       - "${API_PORT}:3000" # Spoljni port iz .env : Fiksni interni NestJS port 3000
+#     depends_on:
+#       - mongodb
+#     environment:
+#       - MONGO_URI=${MONGO_URI}
+#       - FRONT_CORS=${FRONT_CORS}
+#       - PORT=3000 # Ostavljamo hardkodovano za NestJS interno
+#       - SMTP_HOST=${SMTP_HOST}
+#       - SMTP_PORT=${SMTP_PORT}
+#       - SMTP_USER=${SMTP_USER}
+#       - SMTP_PASS=${SMTP_PASS}
+#       - MAIL_FROM=${MAIL_FROM}
+#     restart: unless-stopped
+
+#   client:
+#     build:
+#       context: ./client
+#       dockerfile: Dockerfile
+#       args:
+#         - VITE_API_HOST=${VITE_API_URL}
+#     container_name: sumos-client
+#     ports:
+#       - "${CLIENT_PORT}:80" # Spoljni port iz .env : Fiksni interni Nginx port 80
+#     depends_on:
+#       - api
+#     restart: unless-stopped
+
+# volumes:
+#   mongo_data:
+
+services:
+  mongodb:
+    image: mongo:8.0
+    container_name: sumos-mongo
+    ports:
+      - "${MONGO_PORT}:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: sumos-api
+    ports:
+      - "${API_PORT}:3000"
+    volumes:
+      - ./api:/usr/src/app # BIND MOUNT: prati tvoje izmene u API-ju
+      - /usr/src/app/node_modules # ANONIMNI VOLUMEN: štiti kontejnerske pakete
+    command: npm run start:dev # Pokreće NestJS u watch modu
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - FRONT_CORS=${FRONT_CORS}
+      - PORT=3000
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - MAIL_FROM=${MAIL_FROM}
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: build # KLJUČNO: Zaustavlja build pre Nginx-a
+      args:
+        - VITE_API_HOST=${VITE_API_URL}
+    container_name: sumos-client
+    ports:
+      - "${CLIENT_PORT}:5173" # Port za Vite dev server
+    volumes:
+      - ./client:/app # BIND MOUNT: prati tvoje izmene u React kodu
+      - /app/node_modules # ANONIMNI VOLUMEN
+    command: npm run dev -- --host 0.0.0.0 # Pokreće Vite sa osluškivanjem saobraćaja
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
