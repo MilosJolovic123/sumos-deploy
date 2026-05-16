@@ -1,7 +1,0 @@
-FROM node:20-alpine
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
-COPY . .
-# Preskačemo COPY . . jer kod vučemo sa tvog diska uživo
-CMD ["npm", "run", "start:dev"]
