@@ -22,7 +22,7 @@ export function QuestionRenderer({ question, value, onChange }: Props) {
 
   switch (question.type) {
     case "LIKERT": {
-      const v = typeof value === "number" ? value : 3;
+      const v = typeof value === "number" ? value : 0;
       return (
         <LikertScale
           questionText={displayText}
@@ -46,7 +46,8 @@ export function QuestionRenderer({ question, value, onChange }: Props) {
         <NumberInput
           questionText={displayText}
           value={typeof value === "number" ? value : undefined}
-          onChange={(n) => { if (n !== undefined) onChange(n); }}
+          // Dozvoli prosleđivanje undefined vrednosti!
+          onChange={(n) => onChange(n)}
         />
       );
     case "TEXT":

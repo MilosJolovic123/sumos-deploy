@@ -10,7 +10,10 @@ export function Footer() {
           <h4 className="mb-3 text-base font-bold text-brand-blue-deep">Project Coordinator</h4>
           <p className="flex items-center gap-2 text-base text-brand-slate">
             <User className="h-5 w-5 shrink-0" />
-            <span>Assoc. Prof. Katarina Pažur Aničić, Ph. D.</span>
+            <span>
+              Assoc. Prof. Katarina Pažur Aničić,
+              <br /> Ph. D.
+            </span>
           </p>
           <p className="mt-1 flex items-center gap-2 text-base text-brand-slate">
             <Building2 className="h-5 w-5 shrink-0" />
@@ -23,16 +26,25 @@ export function Footer() {
         </div>
 
         <div className="flex items-center justify-center">
-          <img src={sumosLogo} alt="Strengthening the ecosystem for sustainable student mobility" className="h-30 w-auto" />
+          <img
+            src={sumosLogo}
+            alt="Strengthening the ecosystem for sustainable student mobility"
+            className="h-30 w-auto"
+          />
         </div>
 
         <div className="flex items-center justify-center md:justify-end">
-          <img src={euLogo} alt="Co-funded by the Erasmus+ Programme of the European Union" className="h-18 w-auto" />
+          <img
+            src={euLogo}
+            alt="Co-funded by the Erasmus+ Programme of the European Union"
+            className="h-18 w-auto"
+          />
         </div>
       </div>
       <div className="border-t border-border bg-section-muted py-4">
         <p className="mx-auto max-w-[1440px] px-6 text-center text-xs text-muted-foreground sm:px-10 lg:px-[160px]">
-          The sole responsibility for the content of this website lies with the authors. It does not necessarily reflect the opinion of the European Union.
+          The sole responsibility for the content of this website lies with the authors. It does not
+          necessarily reflect the opinion of the European Union.
           <br />
           Copyright © 2026 FOI Varaždin. All Rights Reserved.
         </p>

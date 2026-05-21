@@ -11,25 +11,25 @@ export function NumberInput({ value, onChange, questionText }: Props) {
     <div className="space-y-2 py-4 border-b border-border/50 last:border-0">
       <p className="text-sm font-medium text-foreground">{questionText}</p>
       <Input
-        type="number"
-        inputMode="numeric"
-        min={0}
+        type="text" // 1. Promenjeno iz "number" u "text"
+        inputMode="numeric" // 2. Zadržava numeričku tastaturu na mobilnim uređajima
         value={value ?? ""}
-        onKeyDown={(e) => {
-          // Prevent typing negative signs, exponents, and decimals
-          if (["-", "e", "E", "+", ".", ","].includes(e.key)) {
-            e.preventDefault();
-          }
-        }}
         onChange={(e) => {
-          if (e.target.value === "") {
+          const val = e.target.value;
+
+          // Ako je korisnik obrisao zadnju cifru (ostavio prazno)
+          if (val === "") {
             onChange(undefined);
             return;
           }
-          const n = Number(e.target.value);
-          if (!Number.isNaN(n) && n >= 0) onChange(n);
+
+          // Propušta ISKLJUČIVO brojeve (nema minusa, slova e, tačaka, zareza)
+          if (/^\d+$/.test(val)) {
+            onChange(Number(val));
+          }
         }}
-        className="max-w-[160px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        // Uklonjene su klase za skrivanje strelica jer kod text inputa one ne postoje
+        className="max-w-[160px]"
       />
     </div>
   );

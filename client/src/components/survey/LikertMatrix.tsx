@@ -35,7 +35,7 @@ export function LikertMatrix({
             <tr className="text-muted-foreground">
               <th className="text-left font-normal pb-2"></th>
               {[1, 2, 3, 4, 5].map((n) => (
-                <th key={n} className="px-2 pb-2 text-center font-medium">
+                <th key={n} className="px-2 pb-2 text-center font-large align-top">
                   {n}
                   {n === 1 && <div className="text-[10px] font-normal">{scaleLabels[0]}</div>}
                   {n === 5 && <div className="text-[10px] font-normal">{scaleLabels[1]}</div>}
