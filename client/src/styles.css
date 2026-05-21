@@ -48,6 +48,12 @@
 }
 
 @theme inline {
+  --text-xs: 1rem; /* ranije bilo 0.75rem (12px), sad je 14px */
+  --text-sm: 1.2rem; /* ranije bilo 0.875rem (14px), sad je 16px */
+  --text-base: 1.125rem; /* ranije bilo 1rem (16px), sad je 18px */
+  --text-lg: 1.25rem; /* ranije bilo 1.125rem (18px), sad je 20px */
+  --text-xl: 1.5rem; /* ranije bilo 1.25rem (20px), sad je 24px */
+  --text-2xl: 1.875rem; /* ranije bilo 1.5rem (24px), sad je 30px */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -133,7 +139,6 @@
   }
   html {
     font-family: var(--font-sans);
-    font-size: 20px;
   }
   body {
     background-color: var(--color-background);

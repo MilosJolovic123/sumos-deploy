@@ -55,7 +55,7 @@ function SustainableBehaviour({ averages }: ChartProps) {
             {behaviourBars.map((b) => (
               <div
                 key={b.label}
-                className="flex h-full flex-1 flex-col items-center justify-end"
+                className="flex h-full flex-1 flex-col items-center justify-center"
               >
                 <div
                   className="w-full max-w-[64px] transition-all duration-1000"
@@ -184,13 +184,13 @@ function StatisticsPage() {
 
       <StatisticsOverview data={dashboardData} isLoading={isLoading} />
 
-      <section className="bg-[#f5f5f5] py-10 pb-20">
+      {/* <section className="bg-[#f5f5f5] py-10 pb-20">
         // !!! hidden !!!
         <div className="hidden mx-auto flex max-w-[1440px] flex-col gap-10 px-6 sm:px-10 lg:px-[160px] lg:flex-row lg:items-stretch">
           <SustainableBehaviour averages={dashboardData?.averages}  />
           <SustainableHabits />
         </div>
-      </section>
+      </section> */}
 
       <Footer />
     </main>
