@@ -98,7 +98,7 @@ export class EmailService {
       const mailOptions = {
         from: process.env.MAIL_FROM,
         to: to,
-        subject: 'Your SuMoS Sustainability Profile - Results',
+        subject: 'Your SuMoS Green Profile - Results',
         html: `
           <!DOCTYPE html>
           <html>

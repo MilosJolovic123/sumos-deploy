@@ -48,6 +48,7 @@ import ConsentStep from "@/components/survey/ConsentStep";
 import { DetailedResults } from "@/components/survey/DetailedResults";
 import scooterGirl from "@/assets/scooter-girl.png";
 import postalEnvelope from "@/assets/postal-envelope.png";
+
 /** Mapiranje backend kategorija na ikonice (case-insensitive prefiks). */
 const CATEGORY_META: {
   match: (c: string) => boolean;
@@ -75,6 +76,7 @@ const CATEGORY_META: {
   { match: (c) => c.startsWith("BARRIERS"), label: "Barriers", icon: Shield },
   { match: (c) => /MOBILITY/i.test(c), label: "Mobility", icon: Globe2 },
 ];
+
 // Funkcija za mobility done da se samo ovde izvlaci
 export function deriveMobilityDone(exchangeStatusValue: string | undefined): boolean {
   if (!exchangeStatusValue) return false;
@@ -83,7 +85,7 @@ export function deriveMobilityDone(exchangeStatusValue: string | undefined): boo
 
 /** Grupiše pitanja u "step grupe" — jedan tab = jedna meta grupa. */
 type StepGroup = {
-  key: string; // npr. "AWARENESS", "HABITS", "MOBILITY"
+  key: string; 
   label: string;
   icon: typeof Sun;
   /** Pod-koraci: po backend `category`. Za većinu grupa imaće samo 1 podkorak. */
@@ -189,13 +191,11 @@ export default function SurveyPage() {
     questions,
     questionsLoading,
     setAnswer,
-   // setGeneralInfo,
     setIsRealAttempt,
     setEmail,
     completeSurvey,
     getScore,
     getProgress,
-    // mobilityDone,
     hasConsented,
     setHasConsented,
   } = useSurvey();
@@ -206,25 +206,19 @@ export default function SurveyPage() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showBeforeFinish, setShowBeforeFinish] = useState(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
-  //const [mobilityDone, setMobilityDone] = useState(false);
   const navigate = useNavigate();
 
   const mobilityDone = useMemo(() => {
     const v = state.answers["exchange_status"];
-    return (
-      deriveMobilityDone(typeof v === "string" ? v : undefined) 
-      
-    );
+    return deriveMobilityDone(typeof v === "string" ? v : undefined);
   }, [state.answers]);
 
   const handleDisagree = () => {
-    // Toast sa trajanjem (duration) od 3000ms (3 sekunde)
     toast.error("The survey is interrupted", {
       description: "You did not provide consent. Redirecting to home...",
-      duration: 3000, // Ovo rešava tvoje pitanje o ograničenju toasta
+      duration: 3000,
     });
 
-    // Pauza od 3 sekunde pre navigacije
     setTimeout(() => {
       setHasConsented(false);
       navigate("/");
@@ -279,19 +273,19 @@ export default function SurveyPage() {
     return null;
   };
 
-//uvek na top
   useEffect(() => {
-  if (!errorKey) {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
-  }
-}, [groupIdx, subIdx, errorKey]);
+    if (!errorKey) {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth',
+      });
+    }
+  }, [groupIdx, subIdx, errorKey]);
 
   const goNext = () => {
-    if (isLastGroup && isLastSub) {
+    // Proveravamo da li je progres stigao do 100% za kraj
+    if (progress === 100) {
       const errorLoc = globalValidate();
       if (errorLoc) {
         toast.error("Missing answers", {
@@ -323,7 +317,6 @@ export default function SurveyPage() {
       setSubIdx(0);
       return;
     }
-    ;
   };
 
   const goBack = () => {
@@ -337,7 +330,6 @@ export default function SurveyPage() {
     } else {
       setHasConsented(false);
     }
-
   };
 
   const fillRandomAnswers = () => {
@@ -346,7 +338,6 @@ export default function SurveyPage() {
       Math.floor(Math.random() * (max - min + 1)) + min;
 
     for (const q of questions) {
-      // Mobility pitanja preskači ako student nije bio na razmeni
       if (q.requiresMobility && !mobilityDone) continue;
 
       switch (q.type) {
@@ -408,16 +399,9 @@ export default function SurveyPage() {
       toast.error("Failed to submit to backend. Check console for details.");
     }
   };
-  //Ovde treba hendlovati logiku odgovora i bedz koji je dobio - tu treba prosiriti model dodatno moramo da vidimo kako ce se vracati rezultati
-  //I gde ce se zapravo cuvati bedz - da li ima smisla perzistirati ga ili ga racunati svaki put naknadno
-  const score = getScore();
-  // const badge = getBadge(score);
-  const progress = getProgress();
 
-  // const comparisonData = [
-  //   ...countryFootprintData.slice(0, 5).map((d: { country: string; score: number; color: string }) => ({ ...d, isYou: false })),
-  //   { country: "You", score, color: "hsl(210, 70%, 55%)", isYou: true },
-  // ];
+  const score = getScore();
+  const progress = getProgress();
 
   const headerTitle =
     currentStep === 2
@@ -434,12 +418,15 @@ export default function SurveyPage() {
       <div className={cn("w-full", currentStep === 2 ? "py-0" : "px-4 py-8")}>
         <div className={cn("relative w-full", currentStep === 2 ? "" : "mx-auto max-w-3xl")}>
           
-          {/* Left Sidebar (Question Navigator) - absolute so it doesn't shift centered content */}
+          {/* Question Navigator */}
           {hasConsented && currentStep === 0 && (
-            <div className="hidden lg:block lg:absolute lg:right-full lg:top-0 lg:mr-8 w-64 xl:w-80 shrink-0">
-              <div className="sticky top-8 max-h-[85vh] overflow-y-auto rounded-lg border bg-card p-4 shadow-sm scrollbar-thin">
-                <h3 className="text-base font-bold mb-4 text-foreground text-center">Question Navigator</h3>
-                <div className="grid grid-cols-10 gap-1">
+            <div className="w-[80%] mx-auto lg:mx-0 lg:absolute lg:right-full lg:top-0 lg:mr-8 lg:w-64 xl:w-80 shrink-0 mb-6 lg:mb-0">
+              <div className="lg:sticky lg:top-8 lg:max-h-[85vh] lg:overflow-y-auto rounded-lg border bg-card p-4 shadow-sm lg:scrollbar-thin">
+                <h3 className="text-sm sm:text-base font-bold mb-3 lg:mb-4 text-foreground text-center">
+                  Question Navigator
+                </h3>
+                
+                <div className="grid grid-cols-8 sm:grid-cols-10 gap-1">
                   {allQuestionsNav.map((item) => (
                     <button
                       key={item.q.key}
@@ -448,7 +435,10 @@ export default function SurveyPage() {
                         setGroupIdx(item.gIdx);
                         setSubIdx(item.sIdx);
                         setTimeout(() => {
-                          document.getElementById(`question-${item.q.key}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                          document.getElementById(`question-${item.q.key}`)?.scrollIntoView({ 
+                            behavior: "smooth", 
+                            block: "center" 
+                          });
                         }, 100);
                       }}
                       title={item.q.text}
@@ -469,195 +459,196 @@ export default function SurveyPage() {
           )}
 
           <div className="flex-1 w-full max-w-6xl mx-auto">
-          {!hasConsented ? (
-            <ConsentStep
-              onAgree={() => setHasConsented(true)}
-              onDisagree={handleDisagree}
-            />
-          ) : (
-            <>
-              {/* ─────────── Step 0 & 1: Dinamička pitanja ─────────── */}
-              {currentStep === 0 && (
-                <div className="space-y-6">
-                  {questionsLoading || groups.length === 0 ? (
-                    <div className="rounded-lg border bg-card p-10 text-center text-base text-muted-foreground">
-                      Loading questions…
-                    </div>
-                  ) : (
-                    <>
-                      {/* Glavni tab-ovi (grupe) — povezani pill row kao u Figmi */}
-                      <div className="mx-auto inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-card p-1 shadow-[var(--shadow-card)]">
-                        {groups.map((g, i) => {
-                          const Icon = g.icon;
-                          const status = getGroupStatus(g, state.answers);
-                          const isActive = i === groupIdx;
-                          let btnClass =
-                            "bg-card text-muted-foreground border border-border hover:bg-muted";
-
-                          if (isActive) {
-                            btnClass = "bg-brand-green text-white shadow-sm";
-                          } else if (i < groupIdx) {
-                            btnClass =
-                              i === 0
-                                ? "bg-brand-blue-deep text-white"
-                                : "bg-brand-blue text-white";
-                          } else if (status === "completed") {
-                            btnClass = "bg-brand-blue text-white";
-                          } else if (status === "partial") {
-                            btnClass = "bg-brand-blue/70 text-white";
-                          }
-
-                          return (
-                            <button
-                              key={g.key}
-                              onClick={() => {
-                                setErrorKey(null);
-                                setGroupIdx(i);
-                                setSubIdx(0);
-                              }}
-                              className={cn(
-                                "flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold tracking-wider transition-colors",
-                                btnClass,
-                              )}
-                            >
-                              <Icon className="h-3.5 w-3.5" />
-                              {g.label}
-                            </button>
-                          );
-                        })}
+            {!hasConsented ? (
+              <ConsentStep
+                onAgree={() => setHasConsented(true)}
+                onDisagree={handleDisagree}
+              />
+            ) : (
+              <>
+                {/* ─────────── Step 0 & 1: Dinamička pitanja ─────────── */}
+                {currentStep === 0 && (
+                  <div className="space-y-6">
+                    {questionsLoading || groups.length === 0 ? (
+                      <div className="rounded-lg border bg-card p-10 text-center text-base text-muted-foreground">
+                        Loading questions…
                       </div>
+                    ) : (
+                      <>
+                        {/* Glavni tab-ovi (grupe) */}
+                        <div className="mx-auto inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-card p-1 shadow-[var(--shadow-card)]">
+                          {groups.map((g, i) => {
+                            const Icon = g.icon;
+                            const status = getGroupStatus(g, state.answers);
+                            const isActive = i === groupIdx;
+                            let btnClass =
+                              "bg-card text-muted-foreground border border-border hover:bg-muted";
 
-                      {/* Pod-koraci (samo ako grupa ima više sub-step-ova, npr. HABITS) */}
-                      {currentGroup && currentGroup.subSteps.length > 1 && (
-                        <div className="flex items-start justify-center gap-0 py-4 flex-nowrap w-full overflow-x-auto">
-                          {currentGroup.subSteps.map((sub, i) => {
-                            const subStatus = getSubStatus(sub, state.answers);
-                            const isCurrent = subIdx === i;
+                            if (isActive) {
+                              btnClass = "bg-brand-green text-white shadow-sm";
+                            } else if (i < groupIdx) {
+                              btnClass =
+                                i === 0
+                                  ? "bg-brand-blue-deep text-white"
+                                  : "bg-brand-blue text-white";
+                            } else if (status === "completed") {
+                              btnClass = "bg-brand-blue text-white";
+                            } else if (status === "partial") {
+                              btnClass = "bg-brand-blue/70 text-white";
+                            }
+
                             return (
-                              <div key={sub.category} className="flex items-start">
-                                <button
-                                  onClick={() => {
-                                    setErrorKey(null);
-                                    setSubIdx(i);
-                                  }}
-                                  className="flex w-[110px] flex-col items-center gap-2"
-                                >
-                                  <div
-                                    className={cn(
-                                      "flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors",
-                                      isCurrent
-                                        ? "bg-brand-green text-white"
-                                        : subStatus === "completed"
-                                          ? "bg-brand-blue text-white"
-                                          : subStatus === "partial"
-                                            ? "bg-brand-blue/70 text-white"
-                                            : "bg-card border border-border text-muted-foreground",
-                                    )}
-                                  >
-                                    {String(i + 1).padStart(2, "0")}
-                                  </div>
-                                  <span
-                                    className={cn(
-                                      "max-w-[100px] text-center text-[11px] leading-tight",
-                                      isCurrent
-                                        ? "font-semibold text-brand-blue-deep"
-                                        : "text-muted-foreground",
-                                    )}
-                                  >
-                                    {shortSubLabel(sub.category)}
-                                  </span>
-                                </button>
-                                {i < currentGroup.subSteps.length - 1 && (
-                                  <div className="mt-4 h-px flex-1 min-w-[16px] bg-border" />
+                              <button
+                                key={g.key}
+                                onClick={() => {
+                                  setErrorKey(null);
+                                  setGroupIdx(i);
+                                  setSubIdx(0);
+                                }}
+                                className={cn(
+                                  "flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold tracking-wider transition-colors",
+                                  btnClass,
                                 )}
-                              </div>
+                              >
+                                <Icon className="h-3.5 w-3.5" />
+                                {g.label}
+                              </button>
                             );
                           })}
                         </div>
-                      )}
 
-                      {/* Pitanja */}
-                      <div className="rounded-lg border bg-card p-6 space-y-2">
-                        {currentSub && (
-                          <div className="mb-2 border-b border-border pb-3">
-                            <h3 className="text-base font-bold text-foreground">
-                              {currentSub.category}
-                            </h3>
+                        {/* Pod-koraci */}
+                        {currentGroup && currentGroup.subSteps.length > 1 && (
+                          <div className="flex items-start justify-center gap-0 py-4 flex-nowrap w-full overflow-x-auto">
+                            {currentGroup.subSteps.map((sub, i) => {
+                              const subStatus = getSubStatus(sub, state.answers);
+                              const isCurrent = subIdx === i;
+                              return (
+                                <div key={sub.category} className="flex items-start">
+                                  <button
+                                    onClick={() => {
+                                      setErrorKey(null);
+                                      setSubIdx(i);
+                                    }}
+                                    className="flex w-[110px] flex-col items-center gap-2"
+                                  >
+                                    <div
+                                      className={cn(
+                                        "flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors",
+                                        isCurrent
+                                          ? "bg-brand-green text-white"
+                                          : subStatus === "completed"
+                                            ? "bg-brand-blue text-white"
+                                            : subStatus === "partial"
+                                              ? "bg-brand-blue/70 text-white"
+                                              : "bg-card border border-border text-muted-foreground",
+                                      )}
+                                    >
+                                      {String(i + 1).padStart(2, "0")}
+                                    </div>
+                                    <span
+                                      className={cn(
+                                        "max-w-[100px] text-center text-[11px] leading-tight",
+                                        isCurrent
+                                          ? "font-semibold text-brand-blue-deep"
+                                          : "text-muted-foreground",
+                                      )}
+                                    >
+                                      {shortSubLabel(sub.category)}
+                                    </span>
+                                  </button>
+                                  {i < currentGroup.subSteps.length - 1 && (
+                                    <div className="mt-4 h-px flex-1 min-w-[16px] bg-border" />
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
-                        {currentQuestions.map((q) => (
-                          <div
-                            key={q.key}
-                            id={`question-${q.key}`}
-                            className={cn(
-                              "transition-all duration-300",
-                              errorKey === q.key ? "ring-2 ring-destructive ring-offset-2 p-3 bg-destructive/5 rounded-xl" : ""
-                            )}
-                          >
-                            <QuestionRenderer
-                              question={q}
-                              value={state.answers[q.key]}
-                              onChange={(v) => {
-                                if (errorKey === q.key) setErrorKey(null);
-                                setAnswer(q.key, v);
-                              }}
-                            />
+
+                        {/* Pitanja */}
+                        <div className="rounded-lg border bg-card p-6 space-y-2">
+                          {currentSub && (
+                            <div className="mb-2 border-b border-border pb-3">
+                              <h3 className="text-base font-bold text-foreground">
+                                {currentSub.category}
+                              </h3>
+                            </div>
+                          )}
+                          {currentQuestions.map((q) => (
+                            <div
+                              key={q.key}
+                              id={`question-${q.key}`}
+                              className={cn(
+                                "transition-all duration-300",
+                                errorKey === q.key ? "ring-2 ring-destructive ring-offset-2 p-3 bg-destructive/5 rounded-xl" : ""
+                              )}
+                            >
+                              <QuestionRenderer
+                                question={q}
+                                value={state.answers[q.key]}
+                                onChange={(v) => {
+                                  if (errorKey === q.key) setErrorKey(null);
+                                  setAnswer(q.key, v);
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Bottom nav */}
+                        <div className="space-y-3 pt-2">
+                          <div className="flex justify-end">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="rounded-full border-dashed text-sm"
+                              onClick={fillRandomAnswers}
+                            >
+                              🎲 Fill with random answers (dev)
+                            </Button>
                           </div>
-                        ))}
-                      </div>
-
-                      {/* Bottom nav */}
-                      <div className="space-y-3 pt-2">
-                        <div className="flex justify-end">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="rounded-full border-dashed text-sm"
-                            onClick={fillRandomAnswers}
-                          >
-                            🎲 Fill with random answers (dev)
-                          </Button>
+                          <div className="flex items-center justify-between">
+                            <Button
+                              variant="outline"
+                              className="rounded-full px-6"
+                              onClick={goBack}
+                            >
+                              Back
+                            </Button>
+                            <span className="text-base font-bold text-foreground">
+                              {progress}%
+                            </span>
+                            <Button
+                              className="rounded-full bg-brand-green px-8 text-white hover:bg-brand-green/90"
+                              onClick={goNext}
+                            >
+                              {/* Uslov je promenjen da proverava progress parametar umesto lokacije tabova */}
+                              {progress === 100 ? "Finish" : "Next"}
+                            </Button>
+                          </div>
+                          <Progress value={progress} className="h-2" />
                         </div>
-                        <div className="flex items-center justify-between">
-                          <Button
-                            variant="outline"
-                            className="rounded-full px-6"
-                            onClick={goBack}
-                          >
-                            Back
-                          </Button>
-                          <span className="text-base font-bold text-foreground">
-                            {progress}%
-                          </span>
-                          <Button
-                            className="rounded-full bg-brand-green px-8 text-white hover:bg-brand-green/90"
-                            onClick={goNext}
-                          >
-                            {isLastGroup && isLastSub ? "Finish" : "Next"}
-                          </Button>
-                        </div>
-                        <Progress value={progress} className="h-2" />
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
+                      </>
+                    )}
+                  </div>
+                )}
 
-              {/* ─────────── Step 2: Detailed Results ─────────── */}
-              {currentStep === 2 && <DetailedResults />}
-            </>
-          )}
+                {/* ─────────── Step 2: Detailed Results ─────────── */}
+                {currentStep === 2 && <DetailedResults />}
+              </>
+            )}
           </div>
 
-          {/* Right Dummy Element (Balances the Left Sidebar to keep the main form perfectly centered) */}
+          {/* Right Dummy Element */}
           {hasConsented && currentStep === 0 && (
             <div className="hidden lg:block w-64 xl:w-80 shrink-0" />
           )}
         </div>
       </div>
 
-      {/* Before finishing modal — Real attempt vs Pilot */}
+      {/* Before finishing modal */}
       <Dialog
         open={showBeforeFinish}
         onOpenChange={(open) => {
