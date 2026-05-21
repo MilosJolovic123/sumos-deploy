@@ -4,3 +4,6 @@
 /client/node_modules/
 /api/dist/
 .env
+/client/Dockerfile.dev
+/api/Dockerfile.dev
+docker-compose.dev.yml
