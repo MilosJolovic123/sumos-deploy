@@ -1,0 +1,47 @@
+services:
+  mongodb:
+    image: mongo:8.0
+    container_name: sumos-mongo
+    ports:
+      - "${MONGO_PORT}:27017"
+    volumes:
+      - mongo_data_dev:/data/db
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    container_name: sumos-api-dev
+    ports:
+      - "${API_PORT}:3000"
+    volumes:
+      - ./api:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - FRONT_CORS=${FRONT_CORS}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - MAIL_FROM=${MAIL_FROM}
+    depends_on:
+      - mongodb
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: sumos-client-dev
+    ports:
+      - "${CLIENT_PORT}:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_HOST=${VITE_API_URL} # U dev okruženju ovo radi savršeno
+    depends_on:
+      - api
+
+volumes:
+  mongo_data_dev:
