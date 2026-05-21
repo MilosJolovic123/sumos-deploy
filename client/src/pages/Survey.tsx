@@ -48,6 +48,7 @@ import ConsentStep from "@/components/survey/ConsentStep";
 import { DetailedResults } from "@/components/survey/DetailedResults";
 import scooterGirl from "@/assets/scooter-girl.png";
 import postalEnvelope from "@/assets/postal-envelope.png";
+
 /** Mapiranje backend kategorija na ikonice (case-insensitive prefiks). */
 const CATEGORY_META: {
   match: (c: string) => boolean;
@@ -75,6 +76,7 @@ const CATEGORY_META: {
   { match: (c) => c.startsWith("BARRIERS"), label: "Barriers", icon: Shield },
   { match: (c) => /MOBILITY/i.test(c), label: "Mobility", icon: Globe2 },
 ];
+
 // Funkcija za mobility done da se samo ovde izvlaci
 export function deriveMobilityDone(exchangeStatusValue: string | undefined): boolean {
   if (!exchangeStatusValue) return false;
@@ -83,7 +85,7 @@ export function deriveMobilityDone(exchangeStatusValue: string | undefined): boo
 
 /** Grupiše pitanja u "step grupe" — jedan tab = jedna meta grupa. */
 type StepGroup = {
-  key: string; // npr. "AWARENESS", "HABITS", "MOBILITY"
+  key: string;
   label: string;
   icon: typeof Sun;
   /** Pod-koraci: po backend `category`. Za većinu grupa imaće samo 1 podkorak. */
@@ -192,7 +194,6 @@ export default function SurveyPage() {
     completeSurvey,
     getScore,
     getProgress,
-    // mobilityDone,
     hasConsented,
     setHasConsented,
   } = useSurvey();
@@ -203,7 +204,6 @@ export default function SurveyPage() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showBeforeFinish, setShowBeforeFinish] = useState(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
-  //const [mobilityDone, setMobilityDone] = useState(false);
   const navigate = useNavigate();
 
   const mobilityDone = useMemo(() => {
@@ -212,13 +212,11 @@ export default function SurveyPage() {
   }, [state.answers]);
 
   const handleDisagree = () => {
-    // Toast sa trajanjem (duration) od 3000ms (3 sekunde)
     toast.error("The survey is interrupted", {
       description: "You did not provide consent. Redirecting to home...",
-      duration: 3000, // Ovo rešava tvoje pitanje o ograničenju toasta
+      duration: 3000,
     });
 
-    // Pauza od 3 sekunde pre navigacije
     setTimeout(() => {
       setHasConsented(false);
       navigate("/");
@@ -280,7 +278,8 @@ export default function SurveyPage() {
   }, [groupIdx, subIdx, errorKey]);
 
   const goNext = () => {
-    if (isLastGroup && isLastSub) {
+    // Proveravamo da li je progres stigao do 100% za kraj
+    if (progress === 100) {
       const errorLoc = globalValidate();
       if (errorLoc) {
         toast.error("Missing answers", {
@@ -334,7 +333,6 @@ export default function SurveyPage() {
     const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
     for (const q of questions) {
-      // Mobility pitanja preskači ako student nije bio na razmeni
       if (q.requiresMobility && !mobilityDone) continue;
 
       switch (q.type) {
@@ -409,13 +407,7 @@ export default function SurveyPage() {
   //Ovde treba hendlovati logiku odgovora i bedz koji je dobio - tu treba prosiriti model dodatno moramo da vidimo kako ce se vracati rezultati
   //I gde ce se zapravo cuvati bedz - da li ima smisla perzistirati ga ili ga racunati svaki put naknadno
   const score = getScore();
-  // const badge = getBadge(score);
   const progress = getProgress();
-
-  // const comparisonData = [
-  //   ...countryFootprintData.slice(0, 5).map((d: { country: string; score: number; color: string }) => ({ ...d, isYou: false })),
-  //   { country: "You", score, color: "hsl(210, 70%, 55%)", isYou: true },
-  // ];
 
   const headerTitle = currentStep === 2 ? "View detailed result" : "Complete the Survey";
 
@@ -425,14 +417,15 @@ export default function SurveyPage() {
 
       <div className={cn("w-full", currentStep === 2 ? "py-0" : "px-4 py-8")}>
         <div className={cn("relative w-full", currentStep === 2 ? "" : "mx-auto max-w-3xl")}>
-          {/* Left Sidebar (Question Navigator) - absolute so it doesn't shift centered content */}
+          {/* Question Navigator */}
           {hasConsented && currentStep === 0 && (
-            <div className="hidden lg:block lg:absolute lg:right-full lg:top-0 lg:mr-8 w-64 xl:w-80 shrink-0">
-              <div className="sticky top-8 max-h-[85vh] overflow-y-auto rounded-lg border bg-card p-4 shadow-sm scrollbar-thin">
-                <h3 className="text-base font-bold mb-4 text-foreground text-center">
+            <div className="w-[80%] mx-auto lg:mx-0 lg:absolute lg:right-full lg:top-0 lg:mr-8 lg:w-64 xl:w-80 shrink-0 mb-6 lg:mb-0">
+              <div className="lg:sticky lg:top-8 lg:max-h-[85vh] lg:overflow-y-auto rounded-lg border bg-card p-4 shadow-sm lg:scrollbar-thin">
+                <h3 className="text-sm sm:text-base font-bold mb-3 lg:mb-4 text-foreground text-center">
                   Question Navigator
                 </h3>
-                <div className="grid grid-cols-10 gap-1">
+
+                <div className="grid grid-cols-8 sm:grid-cols-10 gap-1">
                   {allQuestionsNav.map((item) => (
                     <button
                       key={item.q.key}
@@ -441,9 +434,10 @@ export default function SurveyPage() {
                         setGroupIdx(item.gIdx);
                         setSubIdx(item.sIdx);
                         setTimeout(() => {
-                          document
-                            .getElementById(`question-${item.q.key}`)
-                            ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                          document.getElementById(`question-${item.q.key}`)?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                          });
                         }, 100);
                       }}
                       title={item.q.text}
@@ -479,7 +473,7 @@ export default function SurveyPage() {
                       </div>
                     ) : (
                       <>
-                        {/* Glavni tab-ovi (grupe) — povezani pill row kao u Figmi */}
+                        {/* Glavni tab-ovi (grupe) */}
                         <div className="mx-auto inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-card p-1 shadow-[var(--shadow-card)]">
                           {groups.map((g, i) => {
                             const Icon = g.icon;
@@ -521,7 +515,7 @@ export default function SurveyPage() {
                           })}
                         </div>
 
-                        {/* Pod-koraci (samo ako grupa ima više sub-step-ova, npr. HABITS) */}
+                        {/* Pod-koraci */}
                         {currentGroup && currentGroup.subSteps.length > 1 && (
                           <div className="flex items-start justify-center gap-0 py-4 flex-nowrap w-full overflow-x-auto">
                             {currentGroup.subSteps.map((sub, i) => {
@@ -604,7 +598,7 @@ export default function SurveyPage() {
 
                         {/* Bottom nav */}
                         <div className="space-y-3 pt-2">
-                          {/*  <div className="flex justify-end">
+                          <div className="flex justify-end">
                             <Button
                               type="button"
                               variant="outline"
@@ -614,7 +608,7 @@ export default function SurveyPage() {
                             >
                               🎲 Fill with random answers (dev)
                             </Button>
-                          </div>*/}
+                          </div>
                           <div className="flex items-center justify-between">
                             <Button
                               variant="outline"
@@ -628,7 +622,8 @@ export default function SurveyPage() {
                               className="rounded-full bg-brand-green px-8 text-white hover:bg-brand-green/90"
                               onClick={goNext}
                             >
-                              {isLastGroup && isLastSub ? "Finish" : "Next"}
+                              {/* Uslov je promenjen da proverava progress parametar umesto lokacije tabova */}
+                              {progress === 100 ? "Finish" : "Next"}
                             </Button>
                           </div>
                           <Progress value={progress} className="h-2" />
@@ -644,14 +639,14 @@ export default function SurveyPage() {
             )}
           </div>
 
-          {/* Right Dummy Element (Balances the Left Sidebar to keep the main form perfectly centered) */}
+          {/* Right Dummy Element */}
           {hasConsented && currentStep === 0 && (
             <div className="hidden lg:block w-64 xl:w-80 shrink-0" />
           )}
         </div>
       </div>
 
-      {/* Before finishing modal — Real attempt vs Pilot */}
+      {/* Before finishing modal */}
       <Dialog
         open={showBeforeFinish}
         onOpenChange={(open) => {
