@@ -46,7 +46,8 @@ export function QuestionRenderer({ question, value, onChange }: Props) {
         <NumberInput
           questionText={displayText}
           value={typeof value === "number" ? value : undefined}
-          onChange={(n) => { if (n !== undefined) onChange(n); }}
+          // Dozvoli prosleđivanje undefined vrednosti!
+          onChange={(n) => onChange(n)}
         />
       );
     case "TEXT":

@@ -42,7 +42,7 @@ export interface Question {
  *  - LIKERT-MATRIX   -> Record<option, 1..5>
  *  - RUBRIC          -> Record<dimension, 1..5>
  */
-export type AnswerValue = number | string | Record<string, number>;
+export type AnswerValue = number | string | Record<string, number> | undefined;
 
 export interface Answer {
   questionKey: string;

@@ -204,6 +204,7 @@ export default function SurveyPage() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showBeforeFinish, setShowBeforeFinish] = useState(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const mobilityDone = useMemo(() => {
@@ -386,6 +387,22 @@ export default function SurveyPage() {
   };
 
   const handleEmailSubmit = async () => {
+    // 1. Resetujemo grešku pri svakom novom kliku
+    setError("");
+
+    // 2. Validacija: Da li je polje prazno
+    if (!state.email.trim()) {
+      setError("Email field can't be empty.");
+      return; // Prekidamo izvršavanje funkcije
+    }
+
+    // 3. Validacija: Da li je format mejla ispravan (sadrži @ i tačku)
+    // Možeš koristiti prosto !email.includes("@"), ali je Regex mnogo sigurniji:
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(state.email)) {
+      setError("Please enter a valid email addres (e.g. name@domain.com).");
+      return;
+    }
     setShowEmailModal(false);
     try {
       await completeSurvey({ isRealAttempt: true, email: state.email });
@@ -598,7 +615,7 @@ export default function SurveyPage() {
 
                         {/* Bottom nav */}
                         <div className="space-y-3 pt-2">
-                          <div className="flex justify-end">
+                          {/* <div className="flex justify-end">
                             <Button
                               type="button"
                               variant="outline"
@@ -608,7 +625,7 @@ export default function SurveyPage() {
                             >
                               🎲 Fill with random answers (dev)
                             </Button>
-                          </div>
+                          </div> */}
                           <div className="flex items-center justify-between">
                             <Button
                               variant="outline"
@@ -619,11 +636,13 @@ export default function SurveyPage() {
                             </Button>
                             <span className="text-base font-bold text-foreground">{progress}%</span>
                             <Button
-                              className="rounded-full bg-brand-green px-8 text-white hover:bg-brand-green/90"
+                              className="rounded-full bg-brand-green px-8 text-white hover:bg-brand-green/90 disabled:opacity-50 disabled:cursor-not-allowed"
                               onClick={goNext}
+                              // Dugme je disabled ako smo na poslednjoj grupi (isLastGroup), a progress još uvek nije 100
+                              disabled={isLastGroup && isLastSub && progress !== 100}
                             >
-                              {/* Uslov je promenjen da proverava progress parametar umesto lokacije tabova */}
-                              {progress === 100 ? "Finish" : "Next"}
+                              {/* Piše "Finish" ako smo na poslednjoj grupi ILI ako je progress 100, inače piše "Next" */}
+                              {(isLastGroup && isLastSub) || progress === 100 ? "Finish" : "Next"}
                             </Button>
                           </div>
                           <Progress value={progress} className="h-2" />
@@ -699,7 +718,17 @@ export default function SurveyPage() {
       </Dialog>
 
       {/* Email Modal */}
-      <Dialog open={showEmailModal} onOpenChange={setShowEmailModal}>
+      <Dialog
+        open={showEmailModal}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowEmailModal(false);
+            setCurrentStep(0);
+            state.email = "";
+            setError("");
+          }
+        }}
+      >
         <DialogContent className="max-w-[520px] rounded-2xl p-10">
           <div className="flex justify-center">
             <img
@@ -723,16 +752,23 @@ export default function SurveyPage() {
               <Label className="text-base font-semibold text-foreground">E-mail address</Label>
               <Input
                 type="email"
-                placeholder="marko@example.com"
-                className="mt-2 h-11 rounded-md"
+                placeholder="name@domain.com"
+                //className="mt-2 h-11 rounded-md"
                 value={state.email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError("");
+                }}
+                className={
+                  error ? "border-red-500 focus-visible:ring-red-500" : "mt-2 h-11 rounded-md"
+                }
               />
             </div>
-            <p className="text-sm text-muted-foreground text-center px-2">
+            {error && <p className="text-sm text-red-500 font-medium">{error}</p>}
+            {/* <p className="text-sm text-muted-foreground text-center px-2">
               If you leave this page without requesting the results, you won't be able to return to
               your completed survey.
-            </p>
+            </p> */}
             <Button
               onClick={handleEmailSubmit}
               className="w-full h-12 rounded-md bg-brand-blue text-white text-base font-semibold hover:bg-brand-blue/90"
@@ -743,8 +779,8 @@ export default function SurveyPage() {
               className="w-full text-center text-base font-semibold text-foreground hover:underline"
               onClick={() => {
                 setShowEmailModal(false);
-                handleRealWithoutEmail();
-                setCurrentStep(2);
+                //handleRealWithoutEmail();
+                setCurrentStep(0);
               }}
             >
               Cancel
