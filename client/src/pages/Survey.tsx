@@ -615,7 +615,7 @@ export default function SurveyPage() {
 
                         {/* Bottom nav */}
                         <div className="space-y-3 pt-2">
-                          {/* <div className="flex justify-end">
+                          <div className="flex justify-end">
                             <Button
                               type="button"
                               variant="outline"
@@ -625,7 +625,7 @@ export default function SurveyPage() {
                             >
                               🎲 Fill with random answers (dev)
                             </Button>
-                          </div> */}
+                          </div>
                           <div className="flex items-center justify-between">
                             <Button
                               variant="outline"
