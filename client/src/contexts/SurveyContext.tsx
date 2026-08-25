@@ -167,10 +167,17 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
         : undefined;
     const mobilityDone = deriveMobilityDone(exchangeStatus);
 
-    const isQuestionVisible = (question: Question) =>
-      !question.requiresMobility || mobilityDone;
+    const visibleQuestions = questions.filter(
+      (question) => !question.requiresMobility || mobilityDone,
+    );
 
-    const isQuestionAnswered = (question: Question) => {
+    const requiredQuestions = visibleQuestions.filter(
+      (question) => !question.optional || (question.requiresMobility && mobilityDone),
+    );
+
+    if (requiredQuestions.length === 0) return 100;
+
+    const answered = requiredQuestions.filter((question) => {
       const value = state.answers[question.key];
       if (value === undefined || value === null || value === "") return false;
       if (question.type === "LIKERT-MATRIX") {
@@ -184,14 +191,9 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
         return dimensions.every((dimension) => value[dimension.dimension] !== undefined);
       }
       return true;
-    };
+    }).length;
 
-    const required = questions.filter(
-      (question) => isQuestionVisible(question) && (!question.optional || (question.requiresMobility && mobilityDone)),
-    );
-    if (required.length === 0) return 100;
-    const answered = required.filter(isQuestionAnswered).length;
-    return Math.round((answered / required.length) * 100);
+    return Math.round((answered / requiredQuestions.length) * 100);
   };
 
   // const buildSubmission = () => buildSubmissionFrom(state, questions, mobilityDone);

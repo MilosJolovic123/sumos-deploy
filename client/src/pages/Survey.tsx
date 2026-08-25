@@ -80,7 +80,7 @@ const CATEGORY_META: {
 // Funkcija za mobility done da se samo ovde izvlaci
 export function deriveMobilityDone(exchangeStatusValue: string | undefined): boolean {
   if (!exchangeStatusValue) return false;
-  return /^Yes|currently on my semester abroad/i.test(exchangeStatusValue);
+  return /^(?:Yes\b|.*currently on my semester abroad.*)/i.test(exchangeStatusValue);
 }
 
 /** Grupiše pitanja u "step grupe" — jedan tab = jedna meta grupa. */
