@@ -216,6 +216,9 @@ export default function SurveyPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const score = getScore();
+  const progress = getProgress();
+
   const mobilityDone = useMemo(() => {
     const v = state.answers["exchange_status"];
     return deriveMobilityDone(typeof v === "string" ? v : undefined);
@@ -435,8 +438,6 @@ export default function SurveyPage() {
   };
   //Ovde treba hendlovati logiku odgovora i bedz koji je dobio - tu treba prosiriti model dodatno moramo da vidimo kako ce se vracati rezultati
   //I gde ce se zapravo cuvati bedz - da li ima smisla perzistirati ga ili ga racunati svaki put naknadno
-  const score = getScore();
-  const progress = getProgress();
 
   const headerTitle = currentStep === 2 ? "View detailed result" : "Complete the Survey";
 
