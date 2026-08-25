@@ -713,5 +713,5 @@ export function deriveMobilityDone(
   exchangeStatusValue: string | undefined,
 ): boolean {
   if (!exchangeStatusValue) return false;
-  return /^Yes|currently on my semester abroad/i.test(exchangeStatusValue);
+  return /^(?:Yes\b|.*currently on my semester abroad.*)/i.test(exchangeStatusValue);
 }
