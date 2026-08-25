@@ -167,13 +167,17 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
         : undefined;
     const mobilityDone = deriveMobilityDone(exchangeStatus);
 
+    const isMobilityQuestion = (question: Question) =>
+      Boolean(question.requiresMobility) || /MOBILITY/i.test(question.category);
+
     const visibleQuestions = questions.filter(
-      (question) => !question.requiresMobility || mobilityDone,
+      (question) => !isMobilityQuestion(question) || mobilityDone,
     );
 
-    const requiredQuestions = visibleQuestions.filter(
-      (question) => !question.optional || (question.requiresMobility && mobilityDone),
-    );
+    const requiredQuestions = visibleQuestions.filter((question) => {
+      if (!question.optional) return true;
+      return isMobilityQuestion(question) && mobilityDone;
+    });
 
     if (requiredQuestions.length === 0) return 100;
 
