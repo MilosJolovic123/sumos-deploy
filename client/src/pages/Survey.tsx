@@ -135,8 +135,12 @@ function shortSubLabel(category: string): string {
   return idx === -1 ? category : category.slice(idx + 3);
 }
 
+function isMobilityQuestion(q: Question): boolean {
+  return Boolean(q.requiresMobility) || /MOBILITY/i.test(q.category);
+}
+
 function isQuestionRequired(q: Question, mobilityDone: boolean): boolean {
-  if (q.requiresMobility) return mobilityDone;
+  if (isMobilityQuestion(q)) return mobilityDone;
   return !q.optional;
 }
 
@@ -272,6 +276,8 @@ export default function SurveyPage() {
     return null;
   };
 
+  const surveyReadyToFinish = progress === 100 && globalValidate() === null;
+
   //uvek na top
   useEffect(() => {
     if (!errorKey) {
@@ -285,9 +291,9 @@ export default function SurveyPage() {
 
   const goNext = () => {
     const isFinalVisibleStep = isLastGroup && isLastSub;
+    const errorLoc = isFinalVisibleStep ? globalValidate() : null;
 
     if (isFinalVisibleStep && progress === 100) {
-      const errorLoc = globalValidate();
       if (errorLoc) {
         toast.error("Missing answers", {
           description: "Please answer all mandatory questions. We've highlighted the missing one.",
@@ -644,7 +650,7 @@ export default function SurveyPage() {
                             <Button
                               className="rounded-full bg-brand-green px-8 text-white hover:bg-brand-green/90 disabled:opacity-50 disabled:cursor-not-allowed"
                               onClick={goNext}
-                              disabled={isLastGroup && isLastSub && progress !== 100}
+                              disabled={isLastGroup && isLastSub ? !surveyReadyToFinish : false}
                             >
                               {isLastGroup && isLastSub ? "Finish" : "Next"}
                             </Button>

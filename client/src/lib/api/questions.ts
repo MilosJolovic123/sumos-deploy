@@ -11,7 +11,12 @@ export async function fetchQuestions(): Promise<Question[]> {
     throw new Error("Failed to fetch questions");
   }
   sessionStorage.setItem("surveyStartTime", new Date().toString());
-  return response.json();
+
+  const questions = (await response.json()) as Question[];
+  return questions.map((question) => ({
+    ...question,
+    requiresMobility: question.requiresMobility || /MOBILITY/i.test(question.category),
+  }));
 }
 
 export async function submitSurvey(submission: Submission): Promise<{
