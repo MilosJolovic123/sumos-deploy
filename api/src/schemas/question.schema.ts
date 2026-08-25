@@ -28,6 +28,9 @@ export class Question {
 
   @Prop({ default: false })
   optional!: boolean; // True za pitanja iz poslednje 3 rubrike
+
+  @Prop({ default: false })
+  requiresMobility!: boolean; // True za mobility rubrike koje se aktiviraju samo ako je student bio na razmeni
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);

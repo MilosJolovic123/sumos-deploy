@@ -511,6 +511,7 @@ export class SeedService implements OnModuleInit {
           category: 'BEFORE MOBILITY',
           type: 'RUBRIC', //Ovo je izmenjeno, dodali smo RUBRIC kao tip pitanja u base model
           optional: true,
+          requiresMobility: true,
           options: [
             {
               dimension: 'Awareness',
@@ -560,6 +561,7 @@ export class SeedService implements OnModuleInit {
           category: 'DURING MOBILITY',
           type: 'RUBRIC',
           optional: true,
+          requiresMobility: true,
           options: [
             {
               dimension: 'Awareness',
@@ -609,6 +611,7 @@ export class SeedService implements OnModuleInit {
           category: 'AFTER MOBILITY',
           type: 'RUBRIC',
           optional: true,
+          requiresMobility: true,
           options: [
             {
               dimension: 'Awareness',
