@@ -135,6 +135,11 @@ function shortSubLabel(category: string): string {
   return idx === -1 ? category : category.slice(idx + 3);
 }
 
+function isQuestionRequired(q: Question, mobilityDone: boolean): boolean {
+  if (q.requiresMobility) return mobilityDone;
+  return !q.optional;
+}
+
 function getQuestionStatus(q: Question, answers: Record<string, any>) {
   const val = answers[q.key];
   if (val === undefined || val === null || val === "") return false;
@@ -151,14 +156,14 @@ function getQuestionStatus(q: Question, answers: Record<string, any>) {
   return true;
 }
 
-function getSubStatus(sub: { questions: Question[] }, answers: Record<string, any>) {
+function getSubStatus(sub: { questions: Question[] }, answers: Record<string, any>, mobilityDone: boolean) {
   let totalMandatory = 0;
   let answeredMandatory = 0;
   let hasAnyAnswer = false;
   for (const q of sub.questions) {
     const answered = getQuestionStatus(q, answers);
     if (answered) hasAnyAnswer = true;
-    if (!q.optional) {
+    if (isQuestionRequired(q, mobilityDone)) {
       totalMandatory++;
       if (answered) answeredMandatory++;
     }
@@ -169,11 +174,11 @@ function getSubStatus(sub: { questions: Question[] }, answers: Record<string, an
   return "empty";
 }
 
-function getGroupStatus(g: StepGroup, answers: Record<string, any>) {
+function getGroupStatus(g: StepGroup, answers: Record<string, any>, mobilityDone: boolean) {
   let allCompleted = true;
   let hasAnyAnswer = false;
   for (const sub of g.subSteps) {
-    const s = getSubStatus(sub, answers);
+    const s = getSubStatus(sub, answers, mobilityDone);
     if (s !== "completed") allCompleted = false;
     if (s !== "empty") hasAnyAnswer = true;
   }
@@ -258,7 +263,7 @@ export default function SurveyPage() {
       for (let sIdx = 0; sIdx < group.subSteps.length; sIdx++) {
         const sub = group.subSteps[sIdx];
         for (const q of sub.questions) {
-          if (!q.optional && !getQuestionStatus(q, state.answers)) {
+          if (isQuestionRequired(q, mobilityDone) && !getQuestionStatus(q, state.answers)) {
             return { gIdx, sIdx, key: q.key };
           }
         }
@@ -279,8 +284,9 @@ export default function SurveyPage() {
   }, [groupIdx, subIdx, errorKey]);
 
   const goNext = () => {
-    // Proveravamo da li je progres stigao do 100% za kraj
-    if (progress === 100) {
+    const isFinalVisibleStep = isLastGroup && isLastSub;
+
+    if (isFinalVisibleStep && progress === 100) {
       const errorLoc = globalValidate();
       if (errorLoc) {
         toast.error("Missing answers", {
@@ -494,7 +500,7 @@ export default function SurveyPage() {
                         <div className="mx-auto inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-card p-1 shadow-[var(--shadow-card)]">
                           {groups.map((g, i) => {
                             const Icon = g.icon;
-                            const status = getGroupStatus(g, state.answers);
+                            const status = getGroupStatus(g, state.answers, mobilityDone);
                             const isActive = i === groupIdx;
                             let btnClass =
                               "bg-card text-muted-foreground border border-border hover:bg-muted";
@@ -536,7 +542,7 @@ export default function SurveyPage() {
                         {currentGroup && currentGroup.subSteps.length > 1 && (
                           <div className="flex items-start justify-center gap-0 py-4 flex-nowrap w-full overflow-x-auto">
                             {currentGroup.subSteps.map((sub, i) => {
-                              const subStatus = getSubStatus(sub, state.answers);
+                              const subStatus = getSubStatus(sub, state.answers, mobilityDone);
                               const isCurrent = subIdx === i;
                               return (
                                 <div key={sub.category} className="flex items-start">
@@ -638,11 +644,9 @@ export default function SurveyPage() {
                             <Button
                               className="rounded-full bg-brand-green px-8 text-white hover:bg-brand-green/90 disabled:opacity-50 disabled:cursor-not-allowed"
                               onClick={goNext}
-                              // Dugme je disabled ako smo na poslednjoj grupi (isLastGroup), a progress još uvek nije 100
                               disabled={isLastGroup && isLastSub && progress !== 100}
                             >
-                              {/* Piše "Finish" ako smo na poslednjoj grupi ILI ako je progress 100, inače piše "Next" */}
-                              {(isLastGroup && isLastSub) || progress === 100 ? "Finish" : "Next"}
+                              {isLastGroup && isLastSub ? "Finish" : "Next"}
                             </Button>
                           </div>
                           <Progress value={progress} className="h-2" />

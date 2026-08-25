@@ -161,9 +161,36 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
   };
 
   const getProgress = () => {
-    const required = questions.filter((q) => !q.optional);
-    if (required.length === 0) return 0;
-    const answered = required.filter((q) => state.answers[q.key] !== undefined).length;
+    const exchangeStatus =
+      typeof state.answers["exchange_status"] === "string"
+        ? state.answers["exchange_status"]
+        : undefined;
+    const mobilityDone = deriveMobilityDone(exchangeStatus);
+
+    const isQuestionVisible = (question: Question) =>
+      !question.requiresMobility || mobilityDone;
+
+    const isQuestionAnswered = (question: Question) => {
+      const value = state.answers[question.key];
+      if (value === undefined || value === null || value === "") return false;
+      if (question.type === "LIKERT-MATRIX") {
+        const options = question.options as string[];
+        if (typeof value !== "object" || value === null) return false;
+        return options.every((option) => value[option] !== undefined);
+      }
+      if (question.type === "RUBRIC") {
+        const dimensions = question.options as Array<{ dimension: string }>;
+        if (typeof value !== "object" || value === null) return false;
+        return dimensions.every((dimension) => value[dimension.dimension] !== undefined);
+      }
+      return true;
+    };
+
+    const required = questions.filter(
+      (question) => isQuestionVisible(question) && (!question.optional || (question.requiresMobility && mobilityDone)),
+    );
+    if (required.length === 0) return 100;
+    const answered = required.filter(isQuestionAnswered).length;
     return Math.round((answered / required.length) * 100);
   };
 
