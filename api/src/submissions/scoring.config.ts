@@ -122,6 +122,8 @@ export const scoringConfig = {
   habits_digital_ewaste: { category: 'Digital', reverse: false },
 
   habits_community_activities: { category: 'Engagement', reverse: false },
+  habits_encouraging_friends: { category: 'Engagement', reverse: false },
+  habits_taking_initiative: { category: 'Engagement', reverse: false },
 
   barriers_structural_products: {
     category: 'Barriers',

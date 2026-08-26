@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import axios from "axios";
 import { Info } from "lucide-react";
 import iconGlobe from "@/assets/icon-globe.gif";
 import iconChecklistStat from "@/assets/icon-checklist-stat.svg";
 import iconTimeStat from "@/assets/icon-time-stat.svg";
+import { AverageCompletionTime } from "@/components/sumos/AverageCompletionTime";
 
 const API_HOST = import.meta.env.VITE_API_HOST || "";
 
@@ -18,6 +19,8 @@ export interface Averages {
 export interface DashboardData {
   totalSurveys: number;
   mostPopularBadge: string;
+  averageCompletionTimeMs?: number;
+  averageCompletionTimeSeconds?: number;
   averages: Averages;
 }
 
@@ -176,7 +179,12 @@ export function StatisticsOverview({ data, isLoading }: StatisticsOverviewProps 
   const dashboardData = data !== undefined ? data : internal.data;
   const loading = isLoading !== undefined ? isLoading : internal.isLoading;
 
-  const statsCards = [
+  const statsCards: Array<{
+    src: string;
+    label: string;
+    value: ReactNode;
+    color: string;
+  }> = [
     {
       src: iconChecklistStat,
       label: "Number of filled surveys",
@@ -186,7 +194,13 @@ export function StatisticsOverview({ data, isLoading }: StatisticsOverviewProps 
     {
       src: iconTimeStat,
       label: "Average completion time",
-      value: "10m 42s",
+      value: (
+        <AverageCompletionTime
+          valueMs={dashboardData?.averageCompletionTimeMs}
+          loading={loading}
+          className="text-[#b6d989]"
+        />
+      ),
       color: "text-[#b6d989]",
     },
     {

@@ -5,7 +5,7 @@ import { Submission, SubmissionDocument } from '../schemas/submission.schema';
 import { Question, QuestionDocument } from '../schemas/question.schema';
 import { scoringConfig } from './scoring.config';
 import { EmailService } from '../email/email.service';
-import { ResultDocument } from 'src/schemas/result.schema';
+import { ResultDocument } from '../schemas/result.schema';
 import { feedbackConfig } from './feedback.config';
 
 @Injectable()
@@ -23,10 +23,36 @@ export class SubmissionsService {
   ) {}
 
   async processSubmission(payload: any) {
-    const { email, completionTimeSeconds, isRealAttempt, answers } = payload;
+    const {
+      email,
+      completionTimeSeconds,
+      durationMs,
+      startedAt,
+      finishedAt,
+      isRealAttempt,
+      answers,
+    } = payload;
 
     if (!answers || !Array.isArray(answers)) {
       throw new Error("Missing 'answers' array in payload");
+    }
+
+    const parsedDurationMs = this.normalizeDurationMs({
+      durationMs,
+      completionTimeSeconds,
+      startedAt,
+      finishedAt,
+    });
+
+    const startedAtDate = startedAt ? new Date(startedAt) : null;
+    const finishedAtDate = finishedAt ? new Date(finishedAt) : null;
+
+    if (startedAtDate && Number.isNaN(startedAtDate.getTime())) {
+      throw new Error('Invalid startedAt value');
+    }
+
+    if (finishedAtDate && Number.isNaN(finishedAtDate.getTime())) {
+      throw new Error('Invalid finishedAt value');
     }
 
     const answersMap: Record<string, any> = {};
@@ -81,6 +107,9 @@ export class SubmissionsService {
       mobilityDone: mobilityDone,
       answers: structuredAnswers,
       isRealAttempt: isRealAttempt || false,
+      durationMs: parsedDurationMs,
+      startedAt: startedAtDate,
+      finishedAt: finishedAtDate,
     });
 
     const MAX_RETRIES = 5;
@@ -140,7 +169,10 @@ export class SubmissionsService {
       categoryScores: scores.categoryScores,
       mobility: scores.mobility,
       badge: assignedBadge,
-      completionTimeSeconds: completionTimeSeconds || 0,
+      durationMs: parsedDurationMs,
+      startedAt: startedAtDate,
+      finishedAt: finishedAtDate,
+      completionTimeSeconds: completionTimeSeconds || Math.round(parsedDurationMs / 1000),
       state: newSubmission.state,
       institution: institutionMapValue,
     });
@@ -193,6 +225,38 @@ export class SubmissionsService {
         },
       },
     };
+  }
+
+  private normalizeDurationMs({
+    durationMs,
+    completionTimeSeconds,
+    startedAt,
+    finishedAt,
+  }: {
+    durationMs?: number | null;
+    completionTimeSeconds?: number | null;
+    startedAt?: string | Date | null;
+    finishedAt?: string | Date | null;
+  }): number {
+    const numericDurationMs = Number(durationMs ?? 0);
+    if (Number.isFinite(numericDurationMs) && numericDurationMs >= 0) {
+      return numericDurationMs;
+    }
+
+    const completionSeconds = Number(completionTimeSeconds ?? 0);
+    if (Number.isFinite(completionSeconds) && completionSeconds >= 0) {
+      return Math.round(completionSeconds * 1000);
+    }
+
+    if (startedAt && finishedAt) {
+      const startTime = new Date(startedAt).getTime();
+      const finishTime = new Date(finishedAt).getTime();
+      if (Number.isFinite(startTime) && Number.isFinite(finishTime)) {
+        return Math.max(0, finishTime - startTime);
+      }
+    }
+
+    return 0;
   }
 
   private generateBenchmarkingCode(length = 6): string {
