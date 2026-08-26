@@ -14,7 +14,7 @@ export class StatisticsService {
     const allResults = await this.resultModel
       .find(
         { isRealAttempt: true },
-        { ecoScore: 1, categoryScores: 1, badge: 1 },
+        { ecoScore: 1, categoryScores: 1, badge: 1, durationMs: 1, completionTimeSeconds: 1 },
       )
       .lean()
       .exec();
@@ -25,6 +25,7 @@ export class StatisticsService {
     }
 
     const totalSurveys = allResults.length;
+    const averageCompletionTimeMs = this.calculateAverageCompletionTimeMs(allResults);
 
     // Zbirovi za proseke
     let ecoSum = 0;
@@ -73,6 +74,8 @@ export class StatisticsService {
     return {
       totalSurveys,
       mostPopularBadge,
+      averageCompletionTimeMs,
+      averageCompletionTimeSeconds: this.round(averageCompletionTimeMs / 1000),
       averages: {
         ecoScore: this.round(ecoSum / totalSurveys),
         awareness: this.round(awarenessSum / totalSurveys),
@@ -83,7 +86,42 @@ export class StatisticsService {
     };
   }
 
+  async getAverageCompletionTimeMs() {
+    const allResults = await this.resultModel
+      .find(
+        { isRealAttempt: true },
+        { durationMs: 1, completionTimeSeconds: 1 },
+      )
+      .lean()
+      .exec();
+
+    return this.calculateAverageCompletionTimeMs(allResults || []);
+  }
+
   // --- Pomoćne metode ---
+
+  private calculateAverageCompletionTimeMs(results: any[]): number {
+    const values = results
+      .map((result) => {
+        if (typeof result.durationMs === 'number' && Number.isFinite(result.durationMs)) {
+          return Math.max(0, result.durationMs);
+        }
+        if (
+          typeof result.completionTimeSeconds === 'number' &&
+          Number.isFinite(result.completionTimeSeconds)
+        ) {
+          return Math.max(0, result.completionTimeSeconds * 1000);
+        }
+        return null;
+      })
+      .filter((value): value is number => value !== null && value >= 0);
+
+    if (values.length === 0) {
+      return 0;
+    }
+
+    return values.reduce((sum, value) => sum + value, 0) / values.length;
+  }
 
   private round(value: number): number {
     return value ? parseFloat(value.toFixed(2)) : 0;
@@ -94,6 +132,8 @@ export class StatisticsService {
     return {
       totalSurveys: 0,
       mostPopularBadge: 'No data available',
+      averageCompletionTimeMs: 0,
+      averageCompletionTimeSeconds: 0,
       averages: {
         ecoScore: 0,
         awareness: 0,

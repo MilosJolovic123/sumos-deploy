@@ -10,7 +10,6 @@ export async function fetchQuestions(): Promise<Question[]> {
   if (!response.ok) {
     throw new Error("Failed to fetch questions");
   }
-  sessionStorage.setItem("surveyStartTime", new Date().toString());
 
   const questions = (await response.json()) as Question[];
   return questions.map((question) => ({

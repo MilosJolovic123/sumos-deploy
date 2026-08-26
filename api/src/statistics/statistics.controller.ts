@@ -10,4 +10,14 @@ export class StatisticsController {
   async getDashboard() {
     return await this.statisticsService.getDashboardStats();
   }
+
+  @Get('average-completion-time')
+  @HttpCode(HttpStatus.OK)
+  async getAverageCompletionTime() {
+    const averageCompletionTimeMs = await this.statisticsService.getAverageCompletionTimeMs();
+    return {
+      averageCompletionTimeMs,
+      averageCompletionTimeSeconds: averageCompletionTimeMs / 1000,
+    };
+  }
 }

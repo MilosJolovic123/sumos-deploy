@@ -46,6 +46,15 @@ export class Submission {
   @Prop({required: true})
   isRealAttempt!: boolean;
 
+  @Prop({ type: Number, default: null, index: true })
+  durationMs?: number | null;
+
+  @Prop({ type: Date, default: null })
+  startedAt?: Date | null;
+
+  @Prop({ type: Date, default: null })
+  finishedAt?: Date | null;
+
   @Prop({required: true, unique: true, index: true})
   benchmarkCode!: string;
 

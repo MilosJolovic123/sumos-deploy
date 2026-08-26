@@ -2,6 +2,8 @@ import { ArrowRight, Info } from "lucide-react";
 import iconGlobe from "@/assets/icon-globe.gif";
 import iconChecklistStat from "@/assets/icon-checklist-stat.svg";
 import iconTimeStat from "@/assets/icon-time-stat.svg";
+import { AverageCompletionTime } from "@/components/sumos/AverageCompletionTime";
+import { useDashboardStats } from "@/components/sumos/StatisticsOverview";
 
 const bars = [
   { label: "Awareness", value: 3.5, color: "#518efa" },
@@ -102,15 +104,32 @@ function EcoScore() {
   );
 }
 
-type Stat = { src: string; label: string; value: string; color: string };
-
-const stats: Stat[] = [
-  { src: iconChecklistStat, label: "Number of filled surveys", value: "520", color: "text-[#518efa]" },
-  { src: iconTimeStat, label: "Average completion time", value: "10m 42s", color: "text-[#b6d989]" },
-  { src: iconGlobe, label: "Top eco profile", value: "Eco Explorer", color: "text-[#64a550]" },
-];
+type Stat = { src: string; label: string; value: string | React.ReactNode; color: string };
 
 export function Statistics() {
+  const { data, isLoading } = useDashboardStats();
+
+  const stats: Stat[] = [
+    {
+      src: iconChecklistStat,
+      label: "Number of filled surveys",
+      value: String(data?.totalSurveys ?? 0),
+      color: "text-[#518efa]",
+    },
+    {
+      src: iconTimeStat,
+      label: "Average completion time",
+      value: <AverageCompletionTime valueMs={data?.averageCompletionTimeMs} loading={isLoading} />,
+      color: "text-[#b6d989]",
+    },
+    {
+      src: iconGlobe,
+      label: "Top eco profile",
+      value: isLoading ? "Loading..." : (data?.mostPopularBadge || "Eco Explorer"),
+      color: "text-[#64a550]",
+    },
+  ];
+
   return (
     <section id="statistics" className="bg-[#f5f5f5] py-12 md:py-20">
       <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-6 sm:px-10 lg:px-[160px]">
