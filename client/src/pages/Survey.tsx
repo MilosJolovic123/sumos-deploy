@@ -225,6 +225,7 @@ export default function SurveyPage() {
   }, [state.answers]);
 
   const handleDisagree = () => {
+    sessionStorage.removeItem("surveyStartTime");
     toast.error("The survey is interrupted", {
       description: "You did not provide consent. Redirecting to home...",
       duration: 3000,
@@ -235,6 +236,20 @@ export default function SurveyPage() {
       navigate("/");
     }, 3000);
   };
+
+  useEffect(() => {
+    const cleanupTiming = () => {
+      sessionStorage.removeItem("surveyStartTime");
+    };
+
+    window.addEventListener("beforeunload", cleanupTiming);
+    window.addEventListener("pagehide", cleanupTiming);
+
+    return () => {
+      window.removeEventListener("beforeunload", cleanupTiming);
+      window.removeEventListener("pagehide", cleanupTiming);
+    };
+  }, []);
 
   const groups = useMemo(() => buildStepGroups(questions, mobilityDone), [questions, mobilityDone]);
 
@@ -491,7 +506,13 @@ export default function SurveyPage() {
 
           <div className="flex-1 w-full max-w-6xl mx-auto">
             {!hasConsented ? (
-              <ConsentStep onAgree={() => setHasConsented(true)} onDisagree={handleDisagree} />
+              <ConsentStep
+                onAgree={() => {
+                  sessionStorage.setItem("surveyStartTime", String(Date.now()));
+                  setHasConsented(true);
+                }}
+                onDisagree={handleDisagree}
+              />
             ) : (
               <>
                 {/* ─────────── Step 0 & 1: Dinamička pitanja ─────────── */}

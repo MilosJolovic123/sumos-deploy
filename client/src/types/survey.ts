@@ -58,6 +58,9 @@ export interface Submission {
   // questionnaireVersion: number;
   email: string;
   completionTimeSeconds: number;
+  durationMs?: number;
+  startedAt?: string;
+  finishedAt?: string;
   //  mobilityDone: boolean;
   isRealAttempt: boolean;
   answers: Answer[];

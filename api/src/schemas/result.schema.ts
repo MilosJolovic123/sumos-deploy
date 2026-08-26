@@ -30,6 +30,15 @@ export class Result {
   @Prop({ required: true })
   badge!: string;
 
+  @Prop({ type: Number, required: false, default: 0 })
+  durationMs?: number;
+
+  @Prop({ type: Date, required: false, default: null })
+  startedAt?: Date | null;
+
+  @Prop({ type: Date, required: false, default: null })
+  finishedAt?: Date | null;
+
   @Prop({ required: true })
   completionTimeSeconds!: number;
 

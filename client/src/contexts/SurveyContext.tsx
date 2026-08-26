@@ -124,13 +124,15 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
 
     try {
       const response = await submitSurvey(submission);
-      
+
+      sessionStorage.removeItem("surveyStartTime");
+
       setState((prev) => ({
         ...prev,
         ...overrides,
         isCompleted: true,
         // Backend vraća "result" (jednina) sa scores i feedback poljima
-        results: response.result, 
+        results: response.result,
       }));
     } catch (error) {
       console.error("Survey submission failed:", error);
@@ -139,7 +141,10 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const resetSurvey = () => setState(initialState);
+  const resetSurvey = () => {
+    sessionStorage.removeItem("surveyStartTime");
+    setState(initialState);
+  };
 
   // Ažurirani helperi koji čitaju iz nove 'scores' strukture
   const getScore = () => state.results?.scores.ecoScore || 0;
@@ -364,15 +369,19 @@ function buildSubmissionFrom(
 
   const startTimeStr = sessionStorage.getItem("surveyStartTime");
   let completionTimeSeconds = 0;
+  let durationMs = 0;
+  let startedAt: string | undefined;
+  let finishedAt: string | undefined;
 
   if (startTimeStr) {
-    const startTime = parseInt(startTimeStr, 10);
+    const startTime = Number(startTimeStr);
     const endTime = Date.now();
-    // Računamo razliku u sekundama i zaokružujemo
-    completionTimeSeconds = Math.floor((endTime - startTime) / 1000);
-
-    // Opciono: Čistimo storage jer smo završili
-    sessionStorage.removeItem("surveyStartTime");
+    if (Number.isFinite(startTime)) {
+      durationMs = Math.max(0, endTime - startTime);
+      completionTimeSeconds = Math.floor(durationMs / 1000);
+      startedAt = new Date(startTime).toISOString();
+      finishedAt = new Date(endTime).toISOString();
+    }
   }
 
   //  const stateVal = state.answers["country"] || state.answers["country_of_study"] || state.generalInfo.country;
@@ -386,7 +395,10 @@ function buildSubmissionFrom(
     //  questionnaireVersion: 1,
     email: state.email,
     //  mobilityDone: mobilityDone,
-    completionTimeSeconds: completionTimeSeconds,
+    completionTimeSeconds,
+    durationMs,
+    startedAt,
+    finishedAt,
     isRealAttempt: state.isRealAttempt ?? false,
     answers: answersArray,
   };
