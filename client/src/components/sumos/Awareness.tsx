@@ -64,12 +64,12 @@ export function Awareness() {
           </a>
         </div>
 
-        <div className="mb-8 overflow-hidden">
+        <div className="mb-8 overflow-hidden rounded-[20px] border border-slate-200/70 bg-white/40 p-2">
           <ComposableMap
-            projectionConfig={{ scale: 155 }}
-            width={980}
-            height={460}
-            style={{ width: "100%", height: "auto" }}
+            projectionConfig={{ scale: 205, center: [0, 18] }}
+            width={1200}
+            height={540}
+            style={{ width: "100%", height: "auto", display: "block" }}
           >
             <Geographies geography={worldData as object}>
               {({ geographies }) =>
