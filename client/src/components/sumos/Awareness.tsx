@@ -9,7 +9,7 @@ import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simp
 import { geoMercator } from "d3-geo";
 import { feature } from "topojson-client";
 import { Link } from "react-router-dom";
-
+//trebalo bi da se kreiraju aktuelne izmene
 const MAP_WIDTH = 1200;
 const MAP_HEIGHT = 650;
 
