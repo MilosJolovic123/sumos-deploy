@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Mail } from "lucide-react";
 import ecoGlobe from "@/assets/icon-globe.gif";
+import { getScoreColor } from "@/lib/score-colors";
 
 const fmt = (n: number) =>
   n.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).replace(".", ",");
@@ -22,8 +23,7 @@ function CategoryGauge({
   const circ = Math.PI * r;
   const dash = circ * pct;
 
-  const color =
-    pct >= 0.8 ? "#64a550" : pct >= 0.6 ? "#A3C27C": pct >= 0.4 ? "#455369" : pct >= 0.21 ? "#D89B39" : "#DC493A";
+  const color = getScoreColor(value);
 
   if (size === "sm") {
     return (

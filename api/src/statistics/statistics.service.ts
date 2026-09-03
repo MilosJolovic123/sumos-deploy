@@ -98,6 +98,37 @@ export class StatisticsService {
     return this.calculateAverageCompletionTimeMs(allResults || []);
   }
 
+  async getCountryScores() {
+    const results = await this.resultModel
+      .find(
+        { isRealAttempt: true },
+        { state: 1, ecoScore: 1 },
+      )
+      .lean()
+      .exec();
+
+    const byCountry = new Map<string, { sum: number; count: number }>();
+    for (const result of results) {
+      const country = typeof result.state === 'string' ? result.state.trim() : '';
+      if (!country || typeof result.ecoScore !== 'number' || !Number.isFinite(result.ecoScore)) {
+        continue;
+      }
+
+      const current = byCountry.get(country) || { sum: 0, count: 0 };
+      current.sum += result.ecoScore;
+      current.count += 1;
+      byCountry.set(country, current);
+    }
+
+    return Array.from(byCountry.entries())
+      .map(([country, values]) => ({
+        country,
+        score: this.round(values.sum / values.count),
+        count: values.count,
+      }))
+      .sort((a, b) => b.score - a.score || b.count - a.count || a.country.localeCompare(b.country));
+  }
+
   // --- Pomoćne metode ---
 
   private calculateAverageCompletionTimeMs(results: any[]): number {
