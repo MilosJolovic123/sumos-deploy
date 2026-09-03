@@ -20,4 +20,10 @@ export class StatisticsController {
       averageCompletionTimeSeconds: averageCompletionTimeMs / 1000,
     };
   }
+
+  @Get('country-scores')
+  @HttpCode(HttpStatus.OK)
+  async getCountryScores() {
+    return await this.statisticsService.getCountryScores();
+  }
 }
