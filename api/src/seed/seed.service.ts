@@ -673,7 +673,7 @@ export class SeedService implements OnModuleInit {
             },
           ],
         },
-      ];
+      ].map((question, index) => ({ ...question, order: index }));
 
       // Upis u bazu
       await this.questionModel.insertMany(initialQuestions);
