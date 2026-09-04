@@ -12,7 +12,7 @@ export class QuestionsService {
   ) {}
 
   async findAll() {
-    const questions = await this.questionModel.find().select('-__v').lean().exec();
+    const questions = await this.questionModel.find().select('-__v').lean().sort({order:1}).exec();
 
     const hydratedQuestions = await Promise.all(
       questions.map(async (question) => {
