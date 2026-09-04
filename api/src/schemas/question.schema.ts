@@ -5,6 +5,10 @@ export type QuestionDocument = Question & Document;
 
 @Schema({ timestamps: true })
 export class Question {
+
+  @Prop({required:true})
+  order!: number;
+
   @Prop({ required: true, unique: true })
   key!: string; // Pseudo kljuc za pitanja - tipa awareness_1
 
