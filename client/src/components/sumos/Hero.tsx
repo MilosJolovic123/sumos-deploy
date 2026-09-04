@@ -1,11 +1,16 @@
 import { ArrowRight } from "lucide-react";
-import heroImg from "@/assets/hero-illustration.png";
 import sumosBadge from "@/assets/hero-sumos-logo.png";
 import heroBgShape from "@/assets/hero-bg-shape.svg";
+
+// Import odvojenih slika
+import cloudsBg from "@/assets/hero-clouds.png"; // Oblaci i zelena pozadina
+import greenWheel from "@/assets/hero-wheel.png";      // Točak
+import boyWithLaptop from "@/assets/hero-boy.png"; // Dečak sa laptopom
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-background">
+      {/* Pozadinska figura */}
       <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto max-w-[1440px]">
         <img
           src={heroBgShape}
@@ -14,7 +19,9 @@ export function Hero() {
           className="absolute -top-[67px] right-[649px] h-[637px] w-[791px] max-w-none"
         />
       </div>
+
       <div className="relative mx-auto grid max-w-[1440px] grid-cols-1 gap-10 px-6 pt-12 pb-6 sm:px-10 md:grid-cols-2 md:items-center md:pt-16 lg:px-[160px]">
+        {/* Leva strana - Tekst i CTA */}
         <div className="relative flex flex-col gap-6">
           <img
             src={sumosBadge}
@@ -22,17 +29,12 @@ export function Hero() {
             className="h-[48px] w-[148.966px] object-contain"
           />
           <div className="flex flex-col gap-4">
-            <h1 className="font-display text-[36px] leading-tight text-[#233662] font-bold sm:text-[42px] md:text-[48px]">
-              Benchmarking tool
+            <h1 className="font-display text-[36px] font-bold leading-tight text-[#233662] sm:text-[42px] md:text-[48px]">
+              Explore your green profile and start building greener habits today
             </h1>
-            <div className="flex flex-col gap-7 items-start">
+            <div className="flex flex-col items-start gap-7">
               <p className="max-w-[602px] text-[18px] leading-[26px] text-[#444444]">
-                The benchmarking tool is part of the Erasmus+ European Commission
-                co-funded Education project{" "}
-                <span className="font-semibold">
-                  &ldquo;Strengthening the ecosystem for sustainable student mobility&rdquo;
-                </span>{" "}
-                (SuMoS).
+                Take the survey, benchmark your results against other students, and check tips&tricks to become more sustainable!{" "}
               </p>
               <a
                 href="/survey"
@@ -43,14 +45,35 @@ export function Hero() {
             </div>
           </div>
         </div>
-        <div className="relative flex justify-center">
+
+        {/* Desna strana - Animisani slojevi prilagođeni slici */}
+        <div className="relative flex h-[420px] w-full items-center justify-center sm:h-[480px]">
+          
+          {/* SLOJ 1 (z-0): Pozadinski oblaci i oblik */}
           <img
-            src={heroImg}
-            alt="Student with laptop surrounded by European landmarks"
+            src={cloudsBg}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 z-0 h-full w-full object-contain"
+          />
+
+          {/* SLOJ 2 (z-10): Rotirajući točak sa usporavanjem na 12s */}
+          <img
+            src={greenWheel}
+            alt=""
+            aria-hidden
+            className="absolute z-10 h-[320px] w-[320px] animate-[spin_20s_linear_infinite] object-contain sm:h-[390px] sm:w-[390px]"
+          />
+
+          {/* SLOJ 3 (z-20): Smanjeni dečak pomeren dole-desno prema točku */}
+          <img
+            src={boyWithLaptop}
+            alt="Student with laptop"
             width={1024}
             height={960}
-            className="h-auto w-full max-w-[492px] object-contain"
+            className="absolute bottom-[10px] right-[10px] z-20 h-auto w-[200px] object-contain sm:bottom-[15px] sm:right-[25px] sm:w-[245px]"
           />
+
         </div>
       </div>
     </section>
