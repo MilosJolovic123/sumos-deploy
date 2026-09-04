@@ -4,4 +4,4 @@
 /client/node_modules/
 /api/dist/
 .env
-./node_modules
+node_modules/
