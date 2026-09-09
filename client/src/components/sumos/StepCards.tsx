@@ -20,7 +20,7 @@ const steps: Step[] = [
     borderColor: "border-brand-blue/30",
     icon: iconChecklist,
     title: "Take a survey",
-    desc: "It is a survey about students' green awareness and sustainable habits.",
+    desc: "Find out how sustainable you are and learn which areas you can improve!",
   },
   {
     step: "STEP 02",
@@ -37,8 +37,8 @@ const steps: Step[] = [
     titleColor: "text-brand-green-soft",
     borderColor: "border-brand-green-soft/40",
     icon: iconHandBulb,
-    title: "Get suggestions",
-    desc: "See tips and recommendations to improve your sustainable habits and awareness.",
+    title: "Explore Tips&tricks",
+    desc: "Find tips and tricks that will help you improve your sustainable habits and awareness!",
   },
 ];
 
