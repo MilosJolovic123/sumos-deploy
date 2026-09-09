@@ -768,7 +768,7 @@ function TipsPage() {
       </section>
 
       {/* Main Content Area */}
-      <section className="min-h-[500px] bg-white py-10">
+      <section className="min-h-[500px] bg-white py-10 relative min-h-screen">
         <div className="mx-auto max-w-[1280px] px-6 sm:px-10">
           
           {/* Top Green Category Navigation */}
@@ -874,32 +874,33 @@ function TipsPage() {
 
           {/* Dark Blue Floating Habits Menu */}
 {activeCategory === "habits" && (
-  <div className="mt-16 flex justify-center">
-    <div className="inline-flex max-w-full items-center gap-2 overflow-x-auto rounded-3xl border border-[#172545] bg-[#213560] p-2.5 shadow-xl sm:gap-4">
+  <div className="sticky bottom-6 z-50 mx-auto flex w-fit justify-center pt-8">
+    <div className="inline-flex max-w-full items-center gap-1.5 overflow-x-auto rounded-2xl border border-[#172545] bg-[#213560] p-1.5 shadow-lg sm:gap-2">
+      
       {/* TRAVEL */}
       <button
         onClick={() => handleHabitSubChange("travel")}
-        className={`flex min-w-[120px] flex-col items-center justify-center rounded-2xl px-4 py-3 transition-all sm:min-w-[140px] ${
+        className={`flex min-w-[95px] flex-col items-center justify-center rounded-xl px-3 py-2 transition-all sm:min-w-[110px] ${
           activeHabitSub === "travel"
-            ? "bg-white font-bold text-[#213560] shadow-md"
+            ? "bg-white font-bold text-[#213560] shadow-sm"
             : "font-medium text-white hover:bg-white/10"
         }`}
       >
-        <Plane className={`mb-1 h-6 w-6 ${activeHabitSub === "travel" ? "text-[#65AD55]" : "text-white"}`} />
-        <span className="text-center text-[12px] uppercase tracking-wider">TRAVEL</span>
+        <Plane className={`mb-1 h-4 w-4 ${activeHabitSub === "travel" ? "text-[#65AD55]" : "text-white"}`} />
+        <span className="text-center text-[10px] uppercase tracking-wider">TRAVEL</span>
       </button>
 
       {/* LIVING AND ACCOMMODATION */}
       <button
         onClick={() => handleHabitSubChange("living")}
-        className={`flex min-w-[140px] flex-col items-center justify-center rounded-2xl px-4 py-3 transition-all sm:min-w-[170px] ${
+        className={`flex min-w-[115px] flex-col items-center justify-center rounded-xl px-3 py-2 transition-all sm:min-w-[135px] ${
           activeHabitSub === "living"
-            ? "bg-white font-bold text-[#213560] shadow-md"
+            ? "bg-white font-bold text-[#213560] shadow-sm"
             : "font-medium text-white hover:bg-white/10"
         }`}
       >
-        <Home className={`mb-1 h-6 w-6 ${activeHabitSub === "living" ? "text-[#65AD55]" : "text-white"}`} />
-        <span className="text-center text-[11px] uppercase leading-tight tracking-wider">
+        <Home className={`mb-1 h-4 w-4 ${activeHabitSub === "living" ? "text-[#65AD55]" : "text-white"}`} />
+        <span className="text-center text-[10px] uppercase leading-tight tracking-wider">
           LIVING AND<br />ACCOMMODATION
         </span>
       </button>
@@ -907,14 +908,14 @@ function TipsPage() {
       {/* BUYING AND CONSUMPTION */}
       <button
         onClick={() => handleHabitSubChange("buying")}
-        className={`flex min-w-[140px] flex-col items-center justify-center rounded-2xl px-4 py-3 transition-all sm:min-w-[170px] ${
+        className={`flex min-w-[115px] flex-col items-center justify-center rounded-xl px-3 py-2 transition-all sm:min-w-[135px] ${
           activeHabitSub === "buying"
-            ? "bg-white font-bold text-[#213560] shadow-md"
+            ? "bg-white font-bold text-[#213560] shadow-sm"
             : "font-medium text-white hover:bg-white/10"
         }`}
       >
-        <ShoppingBag className={`mb-1 h-6 w-6 ${activeHabitSub === "buying" ? "text-[#65AD55]" : "text-white"}`} />
-        <span className="text-center text-[11px] uppercase leading-tight tracking-wider">
+        <ShoppingBag className={`mb-1 h-4 w-4 ${activeHabitSub === "buying" ? "text-[#65AD55]" : "text-white"}`} />
+        <span className="text-center text-[10px] uppercase leading-tight tracking-wider">
           BUYING AND<br />CONSUMPTION
         </span>
       </button>
@@ -922,17 +923,18 @@ function TipsPage() {
       {/* DIGITAL HABITS */}
       <button
         onClick={() => handleHabitSubChange("digital")}
-        className={`flex min-w-[120px] flex-col items-center justify-center rounded-2xl px-4 py-3 transition-all sm:min-w-[140px] ${
+        className={`flex min-w-[95px] flex-col items-center justify-center rounded-xl px-3 py-2 transition-all sm:min-w-[110px] ${
           activeHabitSub === "digital"
-            ? "bg-white font-bold text-[#213560] shadow-md"
+            ? "bg-white font-bold text-[#213560] shadow-sm"
             : "font-medium text-white hover:bg-white/10"
         }`}
       >
-        <Smartphone className={`mb-1 h-6 w-6 ${activeHabitSub === "digital" ? "text-[#65AD55]" : "text-white"}`} />
-        <span className="text-center text-[11px] uppercase leading-tight tracking-wider">
+        <Smartphone className={`mb-1 h-4 w-4 ${activeHabitSub === "digital" ? "text-[#65AD55]" : "text-white"}`} />
+        <span className="text-center text-[10px] uppercase leading-tight tracking-wider">
           DIGITAL<br />HABITS
         </span>
       </button>
+
     </div>
   </div>
 )}

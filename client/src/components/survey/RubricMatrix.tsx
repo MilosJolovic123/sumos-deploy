@@ -23,7 +23,7 @@ export function RubricMatrix({ dimensions, value, onChange, questionText }: Prop
     <div className="space-y-4 py-4 border-b border-border/50 last:border-0">
       <p className="text-sm font-medium text-foreground whitespace-pre-line">{questionText}</p>
       <div className="overflow-x-auto">
-        <table className="w-full text-[11px] border-collapse">
+        <table className="w-full text-[12px] border-collapse">
           <thead>
             <tr className="text-muted-foreground">
               <th className="text-left font-medium pb-2 pr-2 align-bottom">Dimension</th>
