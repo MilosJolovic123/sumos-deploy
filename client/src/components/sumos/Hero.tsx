@@ -3,9 +3,7 @@ import sumosBadge from "@/assets/hero-sumos-logo.png";
 import heroBgShape from "@/assets/hero-bg-shape.svg";
 
 // Import odvojenih slika
-import cloudsBg from "@/assets/hero-clouds.png"; // Oblaci i zelena pozadina
-import greenWheel from "@/assets/hero-wheel.png";      // Točak
-import boyWithLaptop from "@/assets/hero-boy.png"; // Dečak sa laptopom
+import heroPic from "@/assets/hero-pic.png"; 
 
 export function Hero() {
   return (
@@ -46,35 +44,16 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Desna strana - Animisani slojevi prilagođeni slici */}
-        <div className="relative flex h-[420px] w-full items-center justify-center sm:h-[480px]">
-          
-          {/* SLOJ 1 (z-0): Pozadinski oblaci i oblik */}
-          <img
-            src={cloudsBg}
-            alt=""
-            aria-hidden
-            className="absolute inset-0 z-0 h-full w-full object-contain"
-          />
-
-          {/* SLOJ 2 (z-10): Rotirajući točak sa usporavanjem na 12s */}
-          <img
-            src={greenWheel}
-            alt=""
-            aria-hidden
-            className="absolute z-10 h-[320px] w-[320px] animate-[spin_20s_linear_infinite] object-contain sm:h-[390px] sm:w-[390px]"
-          />
-
-          {/* SLOJ 3 (z-20): Smanjeni dečak pomeren dole-desno prema točku */}
-          <img
-            src={boyWithLaptop}
-            alt="Student with laptop"
-            width={1024}
-            height={960}
-            className="absolute bottom-[10px] right-[10px] z-20 h-auto w-[200px] object-contain sm:bottom-[15px] sm:right-[25px] sm:w-[245px]"
-          />
-
-        </div>
+        {/* Desna strana - Jedinstvena hero slika */}
+<div className="relative flex justify-center">
+  <img
+    src={heroPic}
+    alt="Student with laptop surrounded by sustainable icons"
+    width={1024}
+    height={960}
+    className="h-auto w-full max-w-[492px] object-contain"
+  />
+</div>
       </div>
     </section>
   );
