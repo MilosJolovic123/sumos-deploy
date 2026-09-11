@@ -32,10 +32,34 @@ const DEFAULT_CENTER: [number, number] = invertedCenter
 
 const API_HOST = import.meta.env.VITE_API_HOST || "";
 const COUNTRY_ALIASES: Record<string, string> = {
-  "United States": "United States of America",
+  "Bolivia (Plurinational State of)": "Bolivia",
+  "Bosnia and Herzegovina": "Bosnia and Herz.",
+  "Brunei Darussalam": "Brunei",
+  "Central African Republic": "Central African Rep.",
   "Czech Republic": "Czechia",
-  "South Korea": "Korea",
+  "Ivory Coast": "Côte d'Ivoire",
+  "Congo (Democratic Republic of the)": "Dem. Rep. Congo",
+  "Dominican Republic": "Dominican Rep.",
+  "Equatorial Guinea": "Eq. Guinea",
+  "Falkland Islands (Malvinas)": "Falkland Is.",
+  "French Southern Territories": "Fr. S. Antarctic Lands",
+  "Iran (Islamic Republic of)": "Iran",
+  "Republic of Kosovo": "Kosovo",
+  "Lao People's Democratic Republic": "Laos",
+  "North Macedonia": "Macedonia",
+  "Moldova (Republic of)": "Moldova",
+  "Korea (Democratic People's Republic of)": "North Korea",
+  "Palestine, State of": "Palestine",
   "Russian Federation": "Russia",
+  "South Sudan": "S. Sudan",
+  "Solomon Islands": "Solomon Is.",
+  "Korea (Republic of)": "South Korea",
+  "Syrian Arab Republic": "Syria",
+  "Tanzania, United Republic of": "Tanzania",
+  "United Kingdom of Great Britain and Northern Ireland": "United Kingdom",
+  "Venezuela (Bolivarian Republic of)": "Venezuela",
+  "Western Sahara": "W. Sahara",
+  Swaziland: "eSwatini",
 };
 
 const MIN_ZOOM = 1;
@@ -68,6 +92,19 @@ export function Awareness() {
   });
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [supportsHover, setSupportsHover] = useState(true);
+
+  // Detekcija da li uređaj stvarno ima hover (miš) ili je touch-only.
+  // Sprečava sudar mouseenter/click sintetičkih eventa na mobilnom.
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setSupportsHover(mq.matches);
+    function handleChange(e: MediaQueryListEvent) {
+      setSupportsHover(e.matches);
+    }
+    mq.addEventListener("change", handleChange);
+    return () => mq.removeEventListener("change", handleChange);
+  }, []);
 
   function handleMoveEnd(newPosition: { coordinates: [number, number]; zoom: number }) {
     setPosition(newPosition);
@@ -85,7 +122,7 @@ export function Awareness() {
     setPosition({ coordinates: DEFAULT_CENTER, zoom: 1 });
   }
 
-  // Escape zatvara fullscreen modal + čisti tooltip
+  // Escape zatvara fullscreen modal
   useEffect(() => {
     if (!isFullscreen) return;
     function handleKeyDown(e: KeyboardEvent) {
@@ -145,7 +182,7 @@ export function Awareness() {
     };
   }
 
-  // Desktop hover ponašanje
+  // Desktop hover ponašanje (aktivno samo kad uređaj stvarno ima hover)
   function handleGeographyEnter(e: React.MouseEvent<SVGPathElement, MouseEvent>, geo: any) {
     setTooltip(buildTooltip(e.clientX, e.clientY, geo));
   }
@@ -158,16 +195,11 @@ export function Awareness() {
     setTooltip(null);
   }
 
-  // Mobile/touch ponašanje - tap na državu prikazuje tooltip,
-  // tap van države (na pozadinu mape) ga zatvara
+  // Tap na državu - uvek prikazuje svež tooltip, bez toggle logike
+  // (toggle je izazivao "pojavi se pa nestane" efekat u sudaru sa hover eventima)
   function handleGeographyTap(e: React.MouseEvent<SVGPathElement, MouseEvent>, geo: any) {
     e.stopPropagation();
-    setTooltip((current) => {
-      const next = buildTooltip(e.clientX, e.clientY, geo);
-      // drugi tap na istu državu zatvara tooltip (toggle)
-      if (current && current.name === next.name) return null;
-      return next;
-    });
+    setTooltip(buildTooltip(e.clientX, e.clientY, geo));
   }
 
   function handleMapBackgroundTap() {
@@ -184,7 +216,8 @@ export function Awareness() {
         }
         width={MAP_WIDTH}
         height={MAP_HEIGHT}
-        style={{ width: "100%", height: "auto", display: "block" }}
+        preserveAspectRatio="xMidYMid slice"
+        style={{ width: "100%", height: "100%", display: "block" }}
       >
         <ZoomableGroup
           center={position.coordinates}
@@ -206,9 +239,9 @@ export function Awareness() {
                   fill={getScoreColor(scoresByCountry.get(geo.properties?.name)?.score ?? -1)}
                   stroke="var(--brand-blue-deep)"
                   strokeWidth={0.4 / position.zoom}
-                  onMouseEnter={(e) => handleGeographyEnter(e, geo)}
-                  onMouseMove={handleGeographyMove}
-                  onMouseLeave={handleGeographyLeave}
+                  onMouseEnter={supportsHover ? (e) => handleGeographyEnter(e, geo) : undefined}
+                  onMouseMove={supportsHover ? handleGeographyMove : undefined}
+                  onMouseLeave={supportsHover ? handleGeographyLeave : undefined}
                   onClick={(e) => handleGeographyTap(e, geo)}
                   style={{
                     default: { outline: "none" },
@@ -225,52 +258,50 @@ export function Awareness() {
   }
 
   // Traka sa alatima (zoom in/out/reset + fullscreen toggle)
-  // Veći touch target na mobilnom (p-2.5 / h-5 w-5), vraća se na originalne
-  // desktop dimenzije (p-1.5 / h-4 w-4) od md: naviše
   function renderToolbar(options?: { showClose?: boolean }) {
     return (
       <div className="absolute right-2 top-2 z-10 flex flex-col gap-1 rounded-lg border border-slate-200 bg-white/90 p-1 shadow-sm md:right-4 md:top-4">
         <button
           onClick={handleZoomIn}
-          className="rounded p-2.5 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
+          className="rounded p-2 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
           aria-label="Zoom in"
           type="button"
         >
-          <ZoomIn className="h-5 w-5 text-brand-blue-deep md:h-4 md:w-4" />
+          <ZoomIn className="h-4 w-4 text-brand-blue-deep" />
         </button>
         <button
           onClick={handleZoomOut}
-          className="rounded p-2.5 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
+          className="rounded p-2 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
           aria-label="Zoom out"
           type="button"
         >
-          <ZoomOut className="h-5 w-5 text-brand-blue-deep md:h-4 md:w-4" />
+          <ZoomOut className="h-4 w-4 text-brand-blue-deep" />
         </button>
         <button
           onClick={handleReset}
-          className="rounded p-2.5 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
+          className="rounded p-2 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
           aria-label="Reset view"
           type="button"
         >
-          <Maximize2 className="h-5 w-5 text-brand-blue-deep md:h-4 md:w-4" />
+          <Maximize2 className="h-4 w-4 text-brand-blue-deep" />
         </button>
         {options?.showClose ? (
           <button
             onClick={() => setIsFullscreen(false)}
-            className="rounded p-2.5 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
+            className="rounded p-2 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
             aria-label="Close fullscreen"
             type="button"
           >
-            <X className="h-5 w-5 text-brand-blue-deep md:h-4 md:w-4" />
+            <X className="h-4 w-4 text-brand-blue-deep" />
           </button>
         ) : (
           <button
             onClick={() => setIsFullscreen(true)}
-            className="rounded p-2.5 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
+            className="rounded p-2 hover:bg-slate-100 active:bg-slate-200 md:p-1.5"
             aria-label="Open fullscreen"
             type="button"
           >
-            <Expand className="h-5 w-5 text-brand-blue-deep md:h-4 md:w-4" />
+            <Expand className="h-4 w-4 text-brand-blue-deep" />
           </button>
         )}
       </div>
@@ -295,16 +326,15 @@ export function Awareness() {
         </div>
 
         <div className="mx-auto max-w-[1280px] px-0 md:px-10">
+          {/* Kontejner mape - viši (aspect-[4/3]) na mobilnom da toolbar
+              ima dovoljno prostora, tačan originalni format na md: naviše */}
           <div
-            className="relative mb-2 touch-none overflow-hidden rounded-xl border border-border bg-card p-3 md:mb-8 md:p-8"
+            className="relative mb-2 aspect-[4/3] w-full touch-none overflow-hidden rounded-xl border border-border bg-card p-3 md:mb-8 md:aspect-[1000/450] md:p-8"
             onClick={handleMapBackgroundTap}
           >
             {renderToolbar()}
             {renderMap()}
           </div>
-          <p className="mb-6 text-center text-xs text-brand-slate md:hidden">
-            Tapni na državu za detalje • Pinch za zumiranje
-          </p>
         </div>
 
         <div className="rounded-xl border border-border bg-card p-4 md:p-8">
@@ -366,8 +396,8 @@ export function Awareness() {
         </div>
       </div>
 
-      {/* Fullscreen modal - na mobilnom zauzima ceo ekran (h-full),
-          na desktopu ostaje centriran sa marginama kao pre */}
+      {/* Fullscreen modal - na mobilnom zauzima ceo ekran, na desktopu
+          ostaje centriran sa marginama kao pre */}
       {isFullscreen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-0 md:p-6"
@@ -381,7 +411,7 @@ export function Awareness() {
             }}
           >
             {renderToolbar({ showClose: true })}
-            <div className="flex h-full items-center md:block">{renderMap()}</div>
+            <div className="h-full w-full md:h-auto">{renderMap()}</div>
           </div>
         </div>
       )}
