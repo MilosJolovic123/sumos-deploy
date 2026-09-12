@@ -31,7 +31,6 @@ export interface DashboardData {
   profilePercentages: Record<string, number>;
 }
 
-/** Hook koji povlači statistiku iz baze. Koristi ga i komponenta i Statistics stranica. */
 export function useDashboardStats() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -56,26 +55,15 @@ export function useDashboardStats() {
   return { data, isLoading };
 }
 
-/* ---------- Footprint bar chart ---------- */
-// function FootprintChart({ averages }: { averages?: Averages }) {
-//   const footprintBars = [
-//     { label: "Awareness", value: averages?.awareness || 0, color: "#518efa" },
-//     { label: "Attitudes", value: averages?.attitudes || 0, color: "#518efa" },
-//     { label: "Habits", value: averages?.habits || 0, color: "#97bcff" },
-//     { label: "Barriers", value: averages?.barriers || 0, color: "#79a7f8" },
-//   ];
-
-//IZNAD JE PRIMER KAKO SU SE DO SADA VUKLI PODACI
-
-
 /* ---------- Footprint bar chart (Green profiles) ---------- */
 function FootprintChart({
-  averages,
   profilePercentages,
 }: {
   averages?: Averages;
   profilePercentages?: Record<string, number>;
 }) {
+  const [showModal, setShowModal] = useState(false);
+
   const profileBars = [
     { label: "Eco Beginner", value: profilePercentages?.ecoBeginner || 0, color: "#414C62" },
     { label: "Eco Explorer", value: profilePercentages?.ecoExplorer || 0, color: "#4C8CFF" },
@@ -89,29 +77,39 @@ function FootprintChart({
   return (
     <div className="flex h-[290px] w-full min-w-0 flex-col justify-between rounded-[12px] bg-white p-6 shadow-[0_0_20px_rgba(94,98,120,0.08)]">
       
-      {/* Naslov sa Info ikonicom i belim popover modalom */}
+      {/* Naslov sa Info ikonicom i responzivnim popover modalom */}
       <div className="flex items-center justify-between mb-1">
         <h3 className="text-[20px] font-bold text-[#1E2B4D]">Green profiles</h3>
         
         <div className="group relative flex items-center">
-          <Info className="h-5 w-5 cursor-pointer text-[#A0A4B8] transition-colors hover:text-[#1E2B4D]" />
+          <Info 
+            onClick={() => setShowModal((prev) => !prev)}
+            className="h-5 w-5 cursor-pointer text-[#A0A4B8] transition-colors hover:text-[#1E2B4D]" 
+          />
           
-          <div className="pointer-events-none absolute right-0 bottom-8 z-50 w-[380px] sm:w-[480px] rounded-[16px] bg-white p-3 opacity-0 shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100 border border-[#E5E7EB]">
-  <img 
-    src={ecoScoreLevelsImg} 
-    alt="Eco Score Levels" 
-    className="h-auto w-full object-contain rounded-[12px]" 
-  />
-  {/* Trougao na dnu */}
-  <div className="absolute -bottom-2 right-2.5 h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.05)]" />
-</div>
+          <div 
+            onClick={() => setShowModal(false)}
+            className={`absolute right-0 bottom-8 z-50 w-[300px] sm:w-[480px] rounded-[16px] bg-white p-3 shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all duration-200 border border-[#E5E7EB] ${
+              showModal 
+                ? "pointer-events-auto opacity-100" 
+                : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
+            }`}
+          >
+            <img 
+              src={ecoScoreLevelsImg} 
+              alt="Eco Score Levels" 
+              className="h-auto w-full object-contain rounded-[12px]" 
+            />
+            {/* Trougao na dnu */}
+            <div className="absolute -bottom-2 right-2.5 h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.05)]" />
+          </div>
         </div>
       </div>
 
       {/* Grafikon */}
       <div className="flex flex-1 gap-3 pt-3 pb-5">
         
-        {/* Y-Osa (0-100) u ravni sa linijama */}
+        {/* Y-Osa */}
         <div className="relative flex w-8 flex-col justify-between text-right text-[11px] font-medium text-[#B5B5C3]">
           {ticks.map((t) => (
             <span key={t} className="transform -translate-y-1/2 leading-none">
@@ -123,43 +121,38 @@ function FootprintChart({
         {/* Mreža i stubići */}
         <div className="relative flex flex-1 flex-col">
           
-          {/* Horizontalne linije mreže */}
           <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 flex flex-col justify-between">
             {ticks.map((t) => (
               <div key={t} className="h-px w-full bg-[#F1F1F4]" />
             ))}
           </div>
 
-          {/* Stubići i kompaktni labeli */}
           <div className="relative flex h-full items-end justify-between gap-1 px-1 sm:gap-4 sm:px-6">
-  {profileBars.map((b) => (
-    <div
-      key={b.label}
-      className="relative flex h-full flex-1 min-w-0 flex-col items-center justify-end"
-    >
-      {/* Procenat iznad stubića */}
-      <span className="mb-1 text-[11px] font-bold text-[#1E2B4D] sm:text-[13px]">
-        {b.value}%
-      </span>
+            {profileBars.map((b) => (
+              <div
+                key={b.label}
+                className="relative flex h-full flex-1 min-w-0 flex-col items-center justify-end"
+              >
+                <span className="mb-1 text-[11px] font-bold text-[#1E2B4D] sm:text-[13px]">
+                  {b.value}%
+                </span>
 
-      {/* Stubić - prilagođava se širini kontejnera uz max-w limit */}
-      <div
-        className="z-10 w-full max-w-[48px] rounded-t-[4px] transition-all duration-1000"
-        style={{
-          height: `${b.value}%`,
-          backgroundColor: b.color,
-        }}
-      />
+                <div
+                  className="z-10 w-full max-w-[48px] rounded-t-[4px] transition-all duration-1000"
+                  style={{
+                    height: `${b.value}%`,
+                    backgroundColor: b.color,
+                  }}
+                />
 
-      {/* Labeli ispod nulte linije - responzivni bez prelivanja */}
-      <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-full max-w-[100px] flex items-center justify-center">
-        <span className="font-gilroy font-normal text-center text-[10px] sm:text-[12px] leading-tight text-[#464E5F] break-words">
-          {b.label}
-        </span>
-      </div>
-    </div>
-  ))}
-</div>
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-full max-w-[100px] flex items-center justify-center">
+                  <span className="font-gilroy font-normal text-center text-[10px] sm:text-[12px] leading-tight text-[#464E5F] break-words">
+                    {b.label}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
 
         </div>
       </div>
@@ -170,6 +163,8 @@ function FootprintChart({
 
 /* ---------- Green score gauge ---------- */
 function GreenScore({ ecoScore }: { ecoScore?: number }) {
+  const [showModal, setShowModal] = useState(false);
+
   const value = Math.round((ecoScore || 0) * 10) / 10 || 0;
   const max = 5;
   const pct = value / max;
@@ -188,17 +183,25 @@ function GreenScore({ ecoScore }: { ecoScore?: number }) {
   return (
     <div className="relative mx-auto flex h-[290px] w-full max-w-[360px] flex-col items-center justify-between rounded-[12px] bg-white px-6 pb-6 pt-6 shadow-[0_0_20px_rgba(94,98,120,0.08)] lg:mx-0 lg:w-[360px] lg:shrink-0">
       
-      {/* Header sa naslovom, Info ikonicom i belim popover modalom */}
+      {/* Header sa naslovom i responzivnom Info ikonicom */}
       <div className="flex w-full items-center justify-between">
         <h3 className="text-[20px] font-semibold text-[#64a550]">Green score</h3>
 
         <div className="group relative flex items-center">
-          <Info className="h-5 w-5 cursor-pointer text-[#A0A4B8] transition-colors hover:text-[#64a550]" />
+          <Info 
+            onClick={() => setShowModal((prev) => !prev)}
+            className="h-5 w-5 cursor-pointer text-[#A0A4B8] transition-colors hover:text-[#64a550]" 
+          />
 
-          {/* Modal oblačić na hover */}
-          <div className="pointer-events-none absolute right-0 bottom-8 z-50 w-[240px] rounded-[10px] bg-white p-4 text-center text-[12px] font-normal leading-relaxed text-[#5E6278] opacity-0 shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100">
+          <div 
+            onClick={() => setShowModal(false)}
+            className={`absolute right-0 bottom-8 z-50 w-[240px] rounded-[10px] bg-white p-4 text-center text-[12px] font-normal leading-relaxed text-[#5E6278] shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition-all duration-200 border border-[#E5E7EB] ${
+              showModal 
+                ? "pointer-events-auto opacity-100" 
+                : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
+            }`}
+          >
             Green Score is calculated from individual survey responses and reflects individual environmental awareness, attitudes, and sustainable habits.
-            {/* Trougao na dnu */}
             <div className="absolute -bottom-2 right-2.5 h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.05)]" />
           </div>
         </div>
@@ -245,9 +248,7 @@ function GreenScore({ ecoScore }: { ecoScore?: number }) {
 }
 
 interface StatisticsOverviewProps {
-  /** Opcioni već učitani podaci. Ako nije prosleđeno, komponenta sama povlači sa API-ja. */
   data?: DashboardData | null;
-  /** Opcioni loading flag kada se podaci dobavljaju spolja. */
   isLoading?: boolean;
   showStatisticsLink?: boolean;
 }
@@ -297,7 +298,6 @@ export function StatisticsOverview({
     <section className="bg-[#F5F5F5] pb-16 pt-12">
       <div className="mx-auto flex max-w-[1440px] flex-col gap-8 px-6 sm:px-10 lg:px-[160px]">
         
-        {/* Header sa naslovom i linkom */}
         <div className="flex items-center justify-between">
           <h2 className="text-[36px] font-bold text-[#233662] md:text-[40px]">
             Green statistics
@@ -312,7 +312,6 @@ export function StatisticsOverview({
           )}
         </div>
 
-        {/* Grafikoni */}
         <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[1fr_360px]">
           <FootprintChart
             averages={dashboardData?.averages}
@@ -321,7 +320,6 @@ export function StatisticsOverview({
           <GreenScore ecoScore={dashboardData?.averages?.ecoScore} />
         </div>
 
-        {/* Stat kartice */}
         <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-3">
           {statsCards.map((s) => (
             <div
