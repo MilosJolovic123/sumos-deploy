@@ -309,6 +309,10 @@ export function Awareness() {
   }
 
   return (
+    <section id="benchmark" className="bg-background py-16">
+      <div className="mx-auto max-w-[1280px] px-10 ">
+        <div className="mb-8 flex items-end justify-between px-10">
+          <h2 className="text-[36px] font-bold text-[#233662] md:text-[40px]">Green awareness</h2>
     <section id="benchmark" className="bg-background py-10 md:py-16">
       <div className="mx-auto max-w-[1280px] px-4 md:px-10">
         <div className="mb-6 flex items-end justify-between md:mb-8">
@@ -317,7 +321,7 @@ export function Awareness() {
           </h2>
           <Link
             to="/statistics"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-brand-blue hover:underline"
+            className="inline-flex items-center gap-1.5 text-[16px] font-medium text-[#518efa] transition-colors hover:text-[#233662]"
           >
             <span className="hidden sm:inline">See full statistics</span>
             <span className="sm:hidden">Statistics</span>
@@ -336,6 +340,7 @@ export function Awareness() {
             {renderMap()}
           </div>
         </div>
+        <div className="rounded-xl border border-border bg-card p-8 mx-10">
 
         <div className="rounded-xl border border-border bg-card p-4 md:p-8">
           <div className="mb-6 flex flex-wrap justify-center gap-4">
