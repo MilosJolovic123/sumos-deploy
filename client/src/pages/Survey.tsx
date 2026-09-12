@@ -454,15 +454,15 @@ export default function SurveyPage() {
   //Ovde treba hendlovati logiku odgovora i bedz koji je dobio - tu treba prosiriti model dodatno moramo da vidimo kako ce se vracati rezultati
   //I gde ce se zapravo cuvati bedz - da li ima smisla perzistirati ga ili ga racunati svaki put naknadno
 
-  const headerTitle = currentStep === 2 ? "View detailed result" : "Complete the Survey";
+  const headerTitle = currentStep === 2 ? "View detailed result" : "Take the Green survey";
 
   return (
     <Layout>
-      <PageHeader title={headerTitle} subtitle="Students' Green Awareness and Sustainable Habits" />
+      <PageHeader title={headerTitle} subtitle="Take the Green survey and discover your Green profile based on your awareness, attitudes, and sustainable habits." />
 
       <div className={cn("w-full", currentStep === 2 ? "py-0" : "px-4 py-8")}>
-        <div className={cn("relative w-full", currentStep === 2 ? "" : "mx-auto max-w-3xl")}>
-          {/* Question Navigator */}
+        <div className={cn("relative w-full", currentStep === 2 ? "" : "mx-auto max-w-5xl")}>
+          {/* Question Navigator
           {hasConsented && currentStep === 0 && (
             <div className="w-[80%] mx-auto lg:mx-0 lg:absolute lg:right-full lg:top-0 lg:mr-8 lg:w-64 xl:w-80 shrink-0 mb-6 lg:mb-0">
               <div className="lg:sticky lg:top-8 lg:max-h-[85vh] lg:overflow-y-auto rounded-lg border bg-card p-4 shadow-sm lg:scrollbar-thin">
@@ -502,7 +502,7 @@ export default function SurveyPage() {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           <div className="flex-1 w-full max-w-6xl mx-auto">
             {!hasConsented ? (
@@ -525,7 +525,7 @@ export default function SurveyPage() {
                     ) : (
                       <>
                         {/* Glavni tab-ovi (grupe) */}
-                        <div className="mx-auto inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-card p-1 shadow-[var(--shadow-card)]">
+                        <div className="mx-auto inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-card p-1 ">
                           {groups.map((g, i) => {
                             const Icon = g.icon;
                             const status = getGroupStatus(g, state.answers, mobilityDone);
@@ -535,15 +535,8 @@ export default function SurveyPage() {
 
                             if (isActive) {
                               btnClass = "bg-brand-green text-white shadow-sm";
-                            } else if (i < groupIdx) {
-                              btnClass =
-                                i === 0
-                                  ? "bg-brand-blue-deep text-white"
-                                  : "bg-brand-blue text-white";
-                            } else if (status === "completed") {
-                              btnClass = "bg-brand-blue text-white";
-                            } else if (status === "partial") {
-                              btnClass = "bg-brand-blue/70 text-white";
+                            }  else if (status === "completed") {
+                              btnClass = "bg-brand-blue-deep text-white";
                             }
 
                             return (
@@ -597,7 +590,7 @@ export default function SurveyPage() {
                                     </div>
                                     <span
                                       className={cn(
-                                        "max-w-[100px] text-center text-[11px] leading-tight",
+                                        "max-w-[100px] text-center text-[13px] leading-tight",
                                         isCurrent
                                           ? "font-semibold text-brand-blue-deep"
                                           : "text-muted-foreground",

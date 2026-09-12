@@ -310,11 +310,12 @@ export function Awareness() {
 
   return (
     <section id="benchmark" className="bg-background py-10 md:py-16">
-      <div className="mx-auto max-w-[1280px] px-4 md:px-10">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-8 px-6 sm:px-10 lg:px-[160px]">
         <div className="mb-6 flex items-end justify-between md:mb-8">
-          <h2 className="text-2xl font-extrabold text-brand-blue-deep md:text-4xl">
-            Green awareness
+          <h2 className="text-[36px] font-bold text-[#233662] md:text-[40px]">
+            Green by countries
           </h2>
+         
           <Link
             to="/statistics"
             className="inline-flex items-center gap-1.5 text-[16px] font-medium text-[#518efa] transition-colors hover:text-[#233662]"
@@ -325,7 +326,7 @@ export function Awareness() {
           </Link>
         </div>
 
-        <div className="mx-auto max-w-[1280px] px-0 md:px-10">
+        <div className="mx-0 max-w-[1280px] px-0">
           {/* Kontejner mape - viši (aspect-[4/3]) na mobilnom da toolbar
               ima dovoljno prostora, tačan originalni format na md: naviše */}
           <div
