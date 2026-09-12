@@ -201,6 +201,7 @@ export default function SurveyPage() {
     setIsRealAttempt,
     setEmail,
     completeSurvey,
+    sendResultsEmail,
     getScore,
     getProgress,
     hasConsented,
@@ -212,6 +213,7 @@ export default function SurveyPage() {
   const [subIdx, setSubIdx] = useState(0);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showBeforeFinish, setShowBeforeFinish] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -433,9 +435,15 @@ export default function SurveyPage() {
       setError("Please enter a valid email addres (e.g. name@domain.com).");
       return;
     }
-    setShowEmailModal(false);
     try {
-      await completeSurvey({ isRealAttempt: true, email: state.email });
+      if (state.isCompleted) {
+        await sendResultsEmail(state.email);
+        setEmailSent(true);
+      } else {
+        await completeSurvey({ isRealAttempt: true, email: state.email });
+        setEmailSent(true);
+      }
+      setShowEmailModal(false);
       setCurrentStep(2);
     } catch (error) {
       toast.error("Failed to submit to backend. Check console for details.");
@@ -445,10 +453,22 @@ export default function SurveyPage() {
   const handleRealWithoutEmail = async () => {
     setShowEmailModal(false);
     try {
-      await completeSurvey({ isRealAttempt: true, email: "" });
+      if (!state.isCompleted) {
+        await completeSurvey({ isRealAttempt: true, email: "" });
+      }
       setCurrentStep(2);
     } catch (error) {
       toast.error("Failed to submit to backend without email. Check console for details.");
+    }
+  };
+
+  const handleEmailModalDismiss = () => {
+    setShowEmailModal(false);
+    setError("");
+    if (state.isCompleted) {
+      setCurrentStep(2);
+    } else {
+      void handleRealWithoutEmail();
     }
   };
   //Ovde treba hendlovati logiku odgovora i bedz koji je dobio - tu treba prosiriti model dodatno moramo da vidimo kako ce se vracati rezultati
@@ -685,7 +705,12 @@ export default function SurveyPage() {
                 )}
 
                 {/* ─────────── Step 2: Detailed Results ─────────── */}
-                {currentStep === 2 && <DetailedResults />}
+                {currentStep === 2 && (
+                  <DetailedResults
+                    showEmailAction={state.isRealAttempt === true && !emailSent}
+                    onRequestEmail={() => setShowEmailModal(true)}
+                  />
+                )}
               </>
             )}
           </div>
@@ -700,14 +725,14 @@ export default function SurveyPage() {
       {/* Before finishing modal */}
       <Dialog
         open={showBeforeFinish}
-        onOpenChange={(open) => {
-          if (!open) {
-            setShowBeforeFinish(false);
-            setCurrentStep(0);
-          }
-        }}
+        onOpenChange={() => undefined}
       >
-        <DialogContent className="max-w-[760px] rounded-3xl p-0 overflow-hidden border border-border/40">
+        <DialogContent
+          hideClose
+          onEscapeKeyDown={(event) => event.preventDefault()}
+          onPointerDownOutside={(event) => event.preventDefault()}
+          className="max-w-[760px] rounded-3xl p-0 overflow-hidden border border-border/40"
+        >
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] items-center bg-white p-6">
             <div className="px-2 lg:px-8 py-6 max-w-[460px]">
               <DialogHeader>
@@ -754,10 +779,7 @@ export default function SurveyPage() {
         open={showEmailModal}
         onOpenChange={(open) => {
           if (!open) {
-            setShowEmailModal(false);
-            setCurrentStep(0);
-            state.email = "";
-            setError("");
+            handleEmailModalDismiss();
           }
         }}
       >
@@ -809,11 +831,7 @@ export default function SurveyPage() {
             </Button>
             <button
               className="w-full text-center text-base font-semibold text-foreground hover:underline"
-              onClick={() => {
-                setShowEmailModal(false);
-                //handleRealWithoutEmail();
-                setCurrentStep(0);
-              }}
+              onClick={handleEmailModalDismiss}
             >
               Cancel
             </button>
