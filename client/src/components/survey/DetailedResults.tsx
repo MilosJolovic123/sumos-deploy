@@ -151,7 +151,7 @@ export function DetailedResults() {
       </section>
 
       <section className="bg-[#f5f5f5]">
-        <div className="mx-auto w-full max-w-[1440px] px-3 pb-20 pt-8 sm:px-6">
+        <div className=" w-full max-w-[1440px] pb-20 pt-8 sm:px-6">
           <h2 className="mb-8 text-[32px] font-bold text-sumos-blue-300 sm:text-[40px]">What should you do next?</h2>
           <div className="h-px w-full bg-sumos-gray-100" />
           <div className="mt-10 space-y-12">
