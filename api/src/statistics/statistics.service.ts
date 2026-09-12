@@ -33,6 +33,18 @@ export class StatisticsService {
     let attitudesSum = 0;
     let habitsSum = 0;
     let barriersSum = 0;
+    const travelTotals = { sum: 0, count: 0 };
+    const livingTotals = { sum: 0, count: 0 };
+    const consumptionTotals = { sum: 0, count: 0 };
+    const digitalTotals = { sum: 0, count: 0 };
+    const engagementTotals = { sum: 0, count: 0 };
+    const profileCounts = {
+      ecoBeginner: 0,
+      ecoExplorer: 0,
+      ecoLearner: 0,
+      ecoAchiever: 0,
+      ecoChampion: 0,
+    };
 
     // Objekat za prebrojavanje bedževa
     const badgeCounts: Record<string, number> = {};
@@ -45,6 +57,12 @@ export class StatisticsService {
       attitudesSum += this.getScoreValue(result.categoryScores, 'Attitudes');
       habitsSum += this.getScoreValue(result.categoryScores, 'Habits');
       barriersSum += this.getScoreValue(result.categoryScores, 'Barriers');
+      this.addScore(travelTotals, result.categoryScores, 'Travel');
+      this.addScore(livingTotals, result.categoryScores, 'Living');
+      this.addScore(consumptionTotals, result.categoryScores, 'Consumption');
+      this.addScore(digitalTotals, result.categoryScores, 'Digital');
+      this.addScore(engagementTotals, result.categoryScores, 'Engagement');
+      profileCounts[this.getProfileKey(result.ecoScore)]++;
 
       // Prebrojavanje bedževa (mnogo prostije sad!)
       const currentBadge = result.badge || 'Unknown badge';
@@ -82,7 +100,18 @@ export class StatisticsService {
         attitudes: this.round(attitudesSum / totalSurveys),
         habits: this.round(habitsSum / totalSurveys),
         barriers: this.round(barriersSum / totalSurveys),
+        travel: this.averageScore(travelTotals),
+        living: this.averageScore(livingTotals),
+        consumption: this.averageScore(consumptionTotals),
+        digital: this.averageScore(digitalTotals),
+        engagement: this.averageScore(engagementTotals),
       },
+      profilePercentages: Object.fromEntries(
+        Object.entries(profileCounts).map(([key, count]) => [
+          key,
+          this.round((count / totalSurveys) * 100),
+        ]),
+      ),
     };
   }
 
@@ -171,9 +200,45 @@ export class StatisticsService {
         attitudes: 0,
         habits: 0,
         barriers: 0,
+        travel: 0,
+        living: 0,
+        consumption: 0,
+        digital: 0,
+        engagement: 0,
         count: 0,
       },
+      profilePercentages: {
+        ecoBeginner: 0,
+        ecoExplorer: 0,
+        ecoLearner: 0,
+        ecoAchiever: 0,
+        ecoChampion: 0,
+      },
     };
+  }
+
+  private addScore(
+    total: { sum: number; count: number },
+    scores: any,
+    category: string,
+  ) {
+    const score = this.getScoreValue(scores, category);
+    if (typeof score === 'number' && Number.isFinite(score)) {
+      total.sum += score;
+      total.count++;
+    }
+  }
+
+  private averageScore(total: { sum: number; count: number }) {
+    return total.count ? this.round(total.sum / total.count) : 0;
+  }
+
+  private getProfileKey(score: number) {
+    if (score <= 1.8) return 'ecoBeginner';
+    if (score <= 2.6) return 'ecoExplorer';
+    if (score <= 3.4) return 'ecoLearner';
+    if (score <= 4.2) return 'ecoAchiever';
+    return 'ecoChampion';
   }
 
   // Ova funkcija proverava da li je Mongoose vratio Map klasu ili običan objekat

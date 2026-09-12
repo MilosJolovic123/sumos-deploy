@@ -15,6 +15,11 @@ export interface Averages {
   attitudes: number;
   habits: number;
   barriers: number;
+  travel: number;
+  living: number;
+  consumption: number;
+  digital: number;
+  engagement: number;
 }
 
 export interface DashboardData {
@@ -23,6 +28,7 @@ export interface DashboardData {
   averageCompletionTimeMs?: number;
   averageCompletionTimeSeconds?: number;
   averages: Averages;
+  profilePercentages: Record<string, number>;
 }
 
 /** Hook koji povlači statistiku iz baze. Koristi ga i komponenta i Statistics stranica. */
@@ -63,13 +69,19 @@ export function useDashboardStats() {
 
 
 /* ---------- Footprint bar chart (Green profiles) ---------- */
-function FootprintChart({ averages }: { averages?: Averages }) {
+function FootprintChart({
+  averages,
+  profilePercentages,
+}: {
+  averages?: Averages;
+  profilePercentages?: Record<string, number>;
+}) {
   const profileBars = [
-    { label: "Eco Beginner", value: 80, color: "#414C62" },
-    { label: "Eco Explorer", value: 56, color: "#4C8CFF" },
-    { label: "Eco Learner", value: 24, color: "#233863" },
-    { label: "Eco Achiever", value: 46, color: "#1D5906" },
-    { label: "Eco Champion", value: 62, color: "#61A348" },
+    { label: "Eco Beginner", value: profilePercentages?.ecoBeginner || 0, color: "#414C62" },
+    { label: "Eco Explorer", value: profilePercentages?.ecoExplorer || 0, color: "#4C8CFF" },
+    { label: "Eco Learner", value: profilePercentages?.ecoLearner || 0, color: "#233863" },
+    { label: "Eco Achiever", value: profilePercentages?.ecoAchiever || 0, color: "#1D5906" },
+    { label: "Eco Champion", value: profilePercentages?.ecoChampion || 0, color: "#61A348" },
   ];
 
   const ticks = [100, 80, 60, 40, 20, 0];
@@ -237,9 +249,14 @@ interface StatisticsOverviewProps {
   data?: DashboardData | null;
   /** Opcioni loading flag kada se podaci dobavljaju spolja. */
   isLoading?: boolean;
+  showStatisticsLink?: boolean;
 }
 
-export function StatisticsOverview({ data, isLoading }: StatisticsOverviewProps = {}) {
+export function StatisticsOverview({
+  data,
+  isLoading,
+  showStatisticsLink = true,
+}: StatisticsOverviewProps = {}) {
   const internal = useDashboardStats();
   const dashboardData = data !== undefined ? data : internal.data;
   const loading = isLoading !== undefined ? isLoading : internal.isLoading;
@@ -285,17 +302,22 @@ export function StatisticsOverview({ data, isLoading }: StatisticsOverviewProps 
           <h2 className="text-[36px] font-bold text-[#233662] md:text-[40px]">
             Green statistics
           </h2>
-          <a
-            href="/statistics"
-            className="inline-flex items-center gap-1.5 text-[16px] font-medium text-[#518efa] transition-colors hover:text-[#233662]"
-          >
-            Go to statistics <ArrowRight className="h-4 w-4" />
-          </a>
+          {showStatisticsLink && (
+            <a
+              href="/statistics"
+              className="inline-flex items-center gap-1.5 text-[16px] font-medium text-[#518efa] transition-colors hover:text-[#233662]"
+            >
+              Go to statistics <ArrowRight className="h-4 w-4" />
+            </a>
+          )}
         </div>
 
         {/* Grafikoni */}
         <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[1fr_360px]">
-          <FootprintChart averages={dashboardData?.averages} />
+          <FootprintChart
+            averages={dashboardData?.averages}
+            profilePercentages={dashboardData?.profilePercentages}
+          />
           <GreenScore ecoScore={dashboardData?.averages?.ecoScore} />
         </div>
 
