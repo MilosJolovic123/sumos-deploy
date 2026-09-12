@@ -1,4 +1,4 @@
-import logoFoi from "@/assets/logo-foi.png";
+import logoFoi from "@/assets/logo-foi.jpg";
 import logoEsiea from "@/assets/logo-esiea.png";
 import logoZilina from "@/assets/logo-zilina.png";
 import logoMaribor from "@/assets/logo-maribor.png";
