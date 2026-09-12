@@ -212,6 +212,7 @@ export class SubmissionsService {
 
     return {
       message: 'Survey completed successfully!',
+      benchmarkCode: newSubmission.benchmarkCode,
       result: {
         scores: {
           ecoScore: scores.ecoScore,
@@ -225,6 +226,76 @@ export class SubmissionsService {
         },
       },
     };
+  }
+
+  async sendResultsEmailByCode(benchmarkCode: string, email: string) {
+    if (typeof benchmarkCode !== 'string' || !benchmarkCode.trim()) {
+      throw new Error('A benchmark code is required.');
+    }
+
+    if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new Error('A valid email address is required.');
+    }
+
+    const result = await this.resultModel
+      .findOne({ benchmarkCode: benchmarkCode.trim(), isRealAttempt: true })
+      .lean()
+      .exec();
+
+    if (!result) {
+      throw new Error('The benchmark code was not found.');
+    }
+
+    let assignedMessage = feedbackConfig.overall[0].message;
+    for (const level of feedbackConfig.overall) {
+      if (result.ecoScore <= level.maxScore) {
+        assignedMessage = level.message;
+        break;
+      }
+    }
+
+    const categorySuggestions: Record<string, string> = {};
+    for (const [category, score] of Object.entries(result.categoryScores)) {
+      const levels =
+        feedbackConfig.categories[
+          category as keyof typeof feedbackConfig.categories
+        ];
+      if (!levels) continue;
+      for (const level of levels) {
+        if (score <= level.maxScore) {
+          categorySuggestions[category] = level.message;
+          break;
+        }
+      }
+    }
+
+    const emailSent = await this.emailService.sendResultsEmail(
+      email,
+      result.ecoScore,
+      result.categoryScores,
+      result.mobility,
+      result.benchmarkCode,
+      result.badge,
+      assignedMessage,
+      categorySuggestions,
+    );
+
+    if (!emailSent) {
+      throw new Error('The results email could not be sent.');
+    }
+
+    await Promise.all([
+      this.resultModel.updateOne(
+        { _id: result._id },
+        { $set: { email } },
+      ).exec(),
+      this.submissionModel.updateOne(
+        { _id: result.submissionId },
+        { $set: { email } },
+      ).exec(),
+    ]);
+
+    return { message: 'Results email sent successfully.' };
   }
 
   private normalizeDurationMs({

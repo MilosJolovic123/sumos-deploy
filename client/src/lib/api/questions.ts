@@ -21,6 +21,7 @@ export async function fetchQuestions(): Promise<Question[]> {
 export async function submitSurvey(submission: Submission): Promise<{
   message: string;
   submissionId: string;
+  benchmarkCode: string;
   result: {
     scores: {
       ecoScore: number;
@@ -55,4 +56,18 @@ export async function submitSurvey(submission: Submission): Promise<{
   }
 
   return response.json();
+}
+
+export async function sendResultsEmail(benchmarkCode: string, email: string) {
+  const response = await fetch(`${API_HOST}/api/submissions/send-results-email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ benchmarkCode, email }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to send results email");
+  }
+
+  return response.json() as Promise<{ message: string }>;
 }
