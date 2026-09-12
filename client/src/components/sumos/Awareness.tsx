@@ -109,12 +109,12 @@ export function Awareness() {
 
   return (
     <section id="benchmark" className="bg-background py-16">
-      <div className="mx-auto max-w-[1280px] px-10">
-        <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-4xl font-extrabold text-brand-blue-deep">Green awareness</h2>
+      <div className="mx-auto max-w-[1280px] px-10 ">
+        <div className="mb-8 flex items-end justify-between px-10">
+          <h2 className="text-[36px] font-bold text-[#233662] md:text-[40px]">Green awareness</h2>
           <Link
             to="/statistics"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-brand-blue hover:underline"
+            className="inline-flex items-center gap-1.5 text-[16px] font-medium text-[#518efa] transition-colors hover:text-[#233662]"
           >
             See full statistics <ArrowRight className="h-4 w-4" />
           </Link>
@@ -201,7 +201,7 @@ export function Awareness() {
             </ComposableMap>
           </div>
         </div>
-        <div className="rounded-xl border border-border bg-card p-8">
+        <div className="rounded-xl border border-border bg-card p-8 mx-10">
           <div className="mb-6 flex flex-wrap justify-center gap-4">
             <h3 className="text-lg font-semibold text-brand-blue-deep">Top 3 countries by score</h3>
             <div className="flex flex-wrap gap-3 text-xs text-brand-slate">
