@@ -27,7 +27,7 @@ export function LikertScale({ value, onChange, labels, questionText }: LikertSca
           <tbody>
             <tr>
               <td className="w-[65px] sm:w-[110px] text-right align-middle pr-2 sm:pr-4">
-                <span className="block text-[10px] sm:text-xs text-[#444444] whitespace-normal break-words leading-tight">
+                <span className="block text-[14px] sm:text-[14px] text-[#444444] whitespace-normal break-words leading-tight">
                   {labels[0]}
                 </span>
               </td>
@@ -93,7 +93,7 @@ export function LikertScale({ value, onChange, labels, questionText }: LikertSca
                           "transition-all duration-200 text-center w-4 cursor-pointer", // Dodat cursor-pointer
                           hasAnswered && n === value
                             ? "text-sm font-bold text-brand-blue-deep"
-                            : "text-xs text-[#9ca3af]",
+                            : "text-sm text-[#9ca3af]",
                         )}
                       >
                         {n}
@@ -104,7 +104,7 @@ export function LikertScale({ value, onChange, labels, questionText }: LikertSca
               </td>
 
               <td className="w-[65px] sm:w-[110px] text-left align-middle pl-2 sm:pl-4">
-                <span className="block text-[10px] sm:text-xs text-[#444444] whitespace-normal break-words leading-tight">
+                <span className="block text-[14px] sm:text-[14px] text-[#444444] whitespace-normal break-words leading-tight">
                   {labels[1]}
                 </span>
               </td>

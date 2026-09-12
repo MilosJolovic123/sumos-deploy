@@ -119,35 +119,35 @@ function FootprintChart({ averages }: { averages?: Averages }) {
           </div>
 
           {/* Stubići i kompaktni labeli */}
-          <div className="relative flex h-full items-end justify-between px-2 sm:px-6">
-            {profileBars.map((b) => (
-              <div
-                key={b.label}
-                className="relative flex h-full w-[80px] flex-col items-center justify-end"
-              >
-                {/* Procenat iznad stubića */}
-                <span className="mb-1 text-[13px] font-bold text-[#1E2B4D]">
-                  {b.value}%
-                </span>
+          <div className="relative flex h-full items-end justify-between gap-1 px-1 sm:gap-4 sm:px-6">
+  {profileBars.map((b) => (
+    <div
+      key={b.label}
+      className="relative flex h-full flex-1 min-w-0 flex-col items-center justify-end"
+    >
+      {/* Procenat iznad stubića */}
+      <span className="mb-1 text-[11px] font-bold text-[#1E2B4D] sm:text-[13px]">
+        {b.value}%
+      </span>
 
-                {/* Stubić */}
-                <div
-                  className="z-10 w-[48px] rounded-t-[4px] transition-all duration-1000"
-                  style={{
-                    height: `${b.value}%`,
-                    backgroundColor: b.color,
-                  }}
-                />
+      {/* Stubić - prilagođava se širini kontejnera uz max-w limit */}
+      <div
+        className="z-10 w-full max-w-[48px] rounded-t-[4px] transition-all duration-1000"
+        style={{
+          height: `${b.value}%`,
+          backgroundColor: b.color,
+        }}
+      />
 
-                {/* Labeli tik ispod nulte linije sa minimalnim razmakom */}
-                <div className="absolute -bottom-5 left-1/2 w-[85px] -translate-x-1/2 text-center">
-                  <span className="font-gilroy font-normal block whitespace-nowrap text-[12px] text-[#464E5F]">
-                    {b.label}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Labeli ispod nulte linije - responzivni bez prelivanja */}
+      <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-full max-w-[100px] flex items-center justify-center">
+        <span className="font-gilroy font-normal text-center text-[10px] sm:text-[12px] leading-tight text-[#464E5F] break-words">
+          {b.label}
+        </span>
+      </div>
+    </div>
+  ))}
+</div>
 
         </div>
       </div>

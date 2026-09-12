@@ -45,15 +45,9 @@ export function Footer() {
             className="transition-colors hover:text-[#518EFA]"
             target="_blank"
           >
-            Privacy notice
+            Terms of service and privacy notice
           </a>
-          <a
-            href="/cookies"
-            className="transition-colors hover:text-[#518EFA]"
-            target="_blank"
-          >
-            Cookie Policy
-          </a>
+          
         </nav>
       </div>
 

@@ -23,7 +23,7 @@ export function RubricMatrix({ dimensions, value, onChange, questionText }: Prop
     <div className="space-y-4 py-4 border-b border-border/50 last:border-0">
       <p className="text-sm font-medium text-foreground whitespace-pre-line">{questionText}</p>
       <div className="overflow-x-auto">
-        <table className="w-full text-[12px] border-collapse">
+        <table className="w-full text-[14px] border-collapse">
           <thead>
             <tr className="text-muted-foreground">
               <th className="text-left font-medium pb-2 pr-2 align-bottom">Dimension</th>
@@ -49,7 +49,7 @@ export function RubricMatrix({ dimensions, value, onChange, questionText }: Prop
                         type="button"
                         onClick={() => setLevel(dim.dimension, level)}
                         className={cn(
-                          "block h-full w-full rounded-md border p-2 text-left text-[10px] leading-snug transition-colors",
+                          "block h-full w-full rounded-md border p-2 text-left text-[13px] leading-snug transition-colors",
                           active
                             ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary"
                             : "border-border bg-card text-muted-foreground hover:bg-muted",
