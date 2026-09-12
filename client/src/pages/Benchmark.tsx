@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   PolarAngleAxis,
   PolarGrid,
@@ -31,6 +31,19 @@ interface UserData {
   ecoScore: number;
   categoryScores: CategoryScores;
   percentile?: number;
+  badge?: string;
+}
+
+interface GroupData {
+  averageScore: number;
+  categories: Record<string, number>;
+  habits: Record<string, number>;
+  resultCount?: number;
+}
+
+interface CountryOption {
+  country: string;
+  institutions: string[];
 }
 
 interface BenchmarkResponse {
@@ -313,41 +326,49 @@ function BenchmarkPage() {
   const [singleCodeLoading, setSingleCodeLoading] = useState(false);
 
   // Stanja polja za 3 filtera
-  const [mobilityStatus, setMobilityStatus] = useState("Yes");
-  const [selectedCountry, setSelectedCountry] = useState("Croatia");
+  const [mobilityStatus, setMobilityStatus] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedInstitution, setSelectedInstitution] = useState("");
+  const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
+  const [initialGroupData, setInitialGroupData] = useState<GroupData | null>(null);
+  const [filterLoading, setFilterLoading] = useState(false);
 
   // Čipovi primenjenih filtera
-  const [appliedFilters, setAppliedFilters] = useState<FilterChip[]>([
-    { id: "country", label: "Croatia" },
-    { id: "mobility", label: "Student mobility" },
-  ]);
+  const [appliedFilters, setAppliedFilters] = useState<FilterChip[]>([]);
 
   // Podaci za Filtriranu Grupu (0 - 5 skala za sve kategorije)
-  const [groupData, setGroupData] = useState({
-    averageScore: 4.1,
-    categories: { Awareness: 4.1, Attitudes: 4.1, Habits: 4.1, Barriers: 4.1 },
-    habits: { Travel: 4.1, Living: 4.1, Consumption: 4.1, Digital: 4.1, Engagement: 4.1 },
+  const [groupData, setGroupData] = useState<GroupData>({
+    averageScore: 0,
+    categories: {},
+    habits: {},
   });
 
   // Podaci za Uneseni Kod Korisnika (0 - 5 skala za sve kategorije)
   const [userData, setUserData] = useState<UserData>({
-    ecoScore: 3.2,
-    percentile: 74,
-    categoryScores: {
-      Awareness: 3.3,
-      Attitudes: 3.3,
-      Habits: 3.3,
-      Barriers: 3.3,
-      Travel: 3.3,
-      Living: 3.3,
-      Consumption: 3.3,
-      Digital: 3.3,
-      Engagement: 3.3,
-    },
+    ecoScore: 0,
+    categoryScores: {},
   });
 
   const API_HOST = import.meta.env.VITE_API_HOST || "";
+
+  useEffect(() => {
+    const loadOverview = async () => {
+      try {
+        const response = await fetch(`${API_HOST}/api/benchmark/overview`);
+        if (!response.ok) throw new Error("Unable to load benchmark data.");
+        const result = await response.json();
+        setGroupData(result.groupData);
+        setInitialGroupData(result.groupData);
+        setCountryOptions(result.countries || []);
+      } catch (error) {
+        toast.error("Unable to load benchmark", {
+          description: error instanceof Error ? error.message : "Please try again.",
+        });
+      }
+    };
+
+    void loadOverview();
+  }, [API_HOST]);
 
   // Pretraga pojedinačnog koda
   const handleShowSingleResults = async () => {
@@ -358,42 +379,32 @@ function BenchmarkPage() {
 
     setSingleCodeLoading(true);
     try {
-      const response = await fetch(`${API_HOST}/api/benchmark/single/${singleCode}`);
-      if (!response.ok) throw new Error("Code not found or invalid.");
+      const response = await fetch(
+        `${API_HOST}/api/benchmark/single/${encodeURIComponent(singleCode.trim())}`,
+      );
       const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Code not found or invalid.");
 
       setUserData({
-        ecoScore: result.ecoScore || 3.8,
-        percentile: result.percentile || 80,
-        categoryScores: result.categoryScores || userData.categoryScores,
+        ecoScore: result.ecoScore,
+        categoryScores: result.categoryScores,
+        badge: result.badge,
+        percentile: result.percentile,
       });
 
       toast.success("Results loaded", { description: `Showing details for code: ${singleCode}` });
-    } catch {
-      // Fallback demo podaci
-      setUserData({
-        ecoScore: 3.2,
-        percentile: 74,
-        categoryScores: {
-          Awareness: 3.3,
-          Attitudes: 3.3,
-          Habits: 3.3,
-          Barriers: 3.3,
-          Travel: 3.3,
-          Living: 3.3,
-          Consumption: 3.3,
-          Digital: 3.3,
-          Engagement: 3.3,
-        },
+    } catch (error) {
+      toast.error("Unable to load results", {
+        description: error instanceof Error ? error.message : "Please try again.",
       });
-      toast.info("Showing results", { description: `Applied code: ${singleCode}` });
     } finally {
       setSingleCodeLoading(false);
     }
   };
 
   // Primena filtera
-  const handleApplyFilters = () => {
+  const handleApplyFilters = async () => {
+    if (!userData.badge) return;
     const newFilters: FilterChip[] = [];
 
     if (selectedCountry) {
@@ -410,35 +421,47 @@ function BenchmarkPage() {
       newFilters.push({ id: "institution", label: selectedInstitution });
     }
 
-    setAppliedFilters(newFilters);
-
-    // Prilagođavamo prosek grupe u zavisnosti od izabranih filtera (skala 0 - 5)
-    const mockScore = selectedCountry === "Croatia" ? 4.3 : 3.8;
-    setGroupData({
-      averageScore: mockScore,
-      categories: {
-        Awareness: mockScore,
-        Attitudes: mockScore,
-        Habits: mockScore,
-        Barriers: mockScore,
-      },
-      habits: {
-        Travel: mockScore,
-        Living: mockScore,
-        Consumption: mockScore,
-        Digital: mockScore,
-        Engagement: mockScore,
-      },
-    });
-
-    toast.success("Filters applied", { description: "Updated average score for the selected group." });
+    setFilterLoading(true);
+    try {
+      const response = await fetch(`${API_HOST}/api/benchmark/filter`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mobilityStatus: mobilityStatus || undefined,
+          country: selectedCountry || undefined,
+          institution: selectedInstitution || undefined,
+          benchmarkCode: singleCode.trim(),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Unable to apply filters.");
+      setGroupData(result);
+      setUserData((previous) => ({
+        ...previous,
+        percentile:
+          typeof result.userPercentile === "number"
+            ? result.userPercentile
+            : previous.percentile,
+      }));
+      setAppliedFilters(newFilters);
+      toast.success("Filters applied", { description: "Updated average score for the selected group." });
+    } catch (error) {
+      toast.error("Unable to apply filters", {
+        description: error instanceof Error ? error.message : "Please try again.",
+      });
+    } finally {
+      setFilterLoading(false);
+    }
   };
 
   const removeFilter = (idToRemove: FilterChip["id"]) => {
     setAppliedFilters((prev) => prev.filter((f) => f.id !== idToRemove));
 
     if (idToRemove === "mobility") setMobilityStatus("");
-    if (idToRemove === "country") setSelectedCountry("");
+    if (idToRemove === "country") {
+      setSelectedCountry("");
+      setSelectedInstitution("");
+    }
     if (idToRemove === "institution") setSelectedInstitution("");
   };
 
@@ -447,6 +470,31 @@ function BenchmarkPage() {
     setMobilityStatus("");
     setSelectedCountry("");
     setSelectedInstitution("");
+    if (initialGroupData) setGroupData(initialGroupData);
+    if (userData.badge) {
+      void fetch(`${API_HOST}/api/benchmark/filter`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ benchmarkCode: singleCode.trim() }),
+      })
+        .then(async (response) => {
+          if (!response.ok) throw new Error("Unable to restore benchmark percentile.");
+          return response.json();
+        })
+        .then((result) => {
+          if (typeof result.userPercentile === "number") {
+            setUserData((previous) => ({
+              ...previous,
+              percentile: result.userPercentile,
+            }));
+          }
+        })
+        .catch((error) => {
+          toast.error("Unable to restore benchmark percentile", {
+            description: error instanceof Error ? error.message : "Please try again.",
+          });
+        });
+    }
   };
 
   // Benchmark 1 on 1 sa prijateljem
@@ -519,8 +567,10 @@ function BenchmarkPage() {
     }));
   }, [data]);
 
-  const userProfile = getGreenProfile(userData.ecoScore);
   const groupProfile = getGreenProfile(groupData.averageScore);
+  const selectedCountryOption = countryOptions.find(
+    (option) => option.country === selectedCountry,
+  );
 
   return (
     <main className="min-h-screen bg-background font-sans">
@@ -649,13 +699,18 @@ function BenchmarkPage() {
                   <div className="relative">
                     <select
                       value={selectedCountry}
-                      onChange={(e) => setSelectedCountry(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedCountry(e.target.value);
+                        setSelectedInstitution("");
+                      }}
                       className="h-10 w-full appearance-none rounded-[6px] border border-[#d1d5db] bg-white px-3 text-[14px] text-[#233662] focus:border-[#61A348] focus:outline-none"
                     >
                       <option value="">Select country by name</option>
-                      <option value="Croatia">Croatia</option>
-                      <option value="Slovenia">Slovenia</option>
-                      <option value="France">France</option>
+                      {countryOptions.map((option) => (
+                        <option key={option.country} value={option.country}>
+                          {option.country}
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-[#94A3B8]" />
                   </div>
@@ -670,11 +725,15 @@ function BenchmarkPage() {
                     <select
                       value={selectedInstitution}
                       onChange={(e) => setSelectedInstitution(e.target.value)}
+                      disabled={!selectedCountry}
                       className="h-10 w-full appearance-none rounded-[6px] border border-[#d1d5db] bg-white px-3 text-[14px] text-[#233662] focus:border-[#61A348] focus:outline-none"
                     >
                       <option value="">Select institution by name</option>
-                      <option value="FOI Varaždin">FOI Varaždin</option>
-                      <option value="University of Zagreb">University of Zagreb</option>
+                      {(selectedCountryOption?.institutions || []).map((institution) => (
+                        <option key={institution} value={institution}>
+                          {institution}
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-[#94A3B8]" />
                   </div>
@@ -685,9 +744,10 @@ function BenchmarkPage() {
               <button
                 type="button"
                 onClick={handleApplyFilters}
-                className="mt-2 h-10 w-[140px] rounded-[6px] bg-[#61A348] text-[14px] font-semibold text-white transition-colors hover:bg-[#528a3d]"
+                disabled={!userData.badge || filterLoading}
+                className="mt-2 h-10 w-[140px] rounded-[6px] bg-[#61A348] text-[14px] font-semibold text-white transition-colors hover:bg-[#528a3d] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Apply
+                {filterLoading ? "Loading..." : "Apply"}
               </button>
             </div>
 
@@ -705,15 +765,35 @@ function BenchmarkPage() {
               </div>
             </div>
 
-            {/* Desna kolona: Profil Unetog Koda + Poruka o poređenju s filterom */}
+            {/* Desna kolona: Bedž unetog koda */}
             <div className="flex flex-col justify-center rounded-[16px] border border-[#e5e7eb] bg-white p-8 shadow-sm lg:col-span-5">
               <h3 className="mb-4 text-[28px] font-bold text-[#61A348]">
-                {userProfile}
+                {userData.badge || "Your Badge"}
               </h3>
-              <p className="text-[16px] leading-relaxed font-semibold text-[#233662]">
-                Your overall score is <span className="text-[#61A348] font-bold">{userData.ecoScore.toFixed(1).replace(".", ",")}</span>. You are better than{" "}
-                <span className="text-[#61A348] font-bold">{userData.percentile || 74}%</span> of other respondents according to the selected filter.
-              </p>
+              {userData.badge ? (
+                <p className="text-[16px] leading-relaxed font-semibold text-[#233662]">
+                  Your overall score is{" "}
+                  <span className="font-bold text-[#61A348]">
+                    {userData.ecoScore.toFixed(2).replace(".", ",")}
+                  </span>
+                  .{" "}
+                  {(userData.percentile ?? 0) < 50 ? (
+                    <>Your habits are clearly improving but you can do even better to match these filters, keep up the good work!</>
+                  ) : (
+                    <>
+                      You are better than{" "}
+                      <span className="font-bold text-[#61A348]">
+                        {userData.percentile}%
+                      </span>{" "}
+                      of other respondents according to the selected filter.
+                    </>
+                  )}
+                </p>
+              ) : (
+                <p className="text-[16px] leading-relaxed font-semibold text-[#233662]">
+                  Enter your code and click “Show results” to see your badge.
+                </p>
+              )}
             </div>
 
           </div>
@@ -723,13 +803,13 @@ function BenchmarkPage() {
             {/* Grafik 1: Sustainability categories (Filtered avg vs User score) */}
             <DetailedCategoryComparison
               filterScores={groupData.categories}
-              userScores={userData.categoryScores}
+              userScores={userData.badge ? userData.categoryScores : {}}
             />
 
             {/* Grafik 2: Sustainable habits (Filtered avg vs User score, 0 - 5 scale) */}
             <DetailedHabitsComparison
               filterScores={groupData.habits}
-              userScores={userData.categoryScores}
+              userScores={userData.badge ? userData.categoryScores : {}}
             />
           </div>
 

@@ -44,10 +44,10 @@ interface ChartProps {
 export function SustainableBehaviour({ averages }: ChartProps) {
   // Svi stubići su ujednačene zelene boje sa slike (#61A348)
   const categoryBars = [
-    { label: "Awareness", value: averages?.awareness || 3.2, color: "#61A348" },
-    { label: "Attitudes", value: averages?.attitudes || 3.2, color: "#61A348" },
-    { label: "Habits", value: averages?.habits || 1.2, color: "#61A348" },
-    { label: "Barriers", value: averages?.barriers || 2.6, color: "#61A348" },
+    { label: "Awareness", value: averages?.awareness || 0, color: "#61A348" },
+    { label: "Attitudes", value: averages?.attitudes || 0, color: "#61A348" },
+    { label: "Habits", value: averages?.habits || 0, color: "#61A348" },
+    { label: "Barriers", value: averages?.barriers || 0, color: "#61A348" },
   ];
 
   const max = 5;
@@ -114,34 +114,34 @@ export function SustainableBehaviour({ averages }: ChartProps) {
 
 /* ---------- 2. Sustainable Habits ---------- */
 export function SustainableHabits({ averages }: ChartProps) {
-  // Plavi stubići sa slike (#4C8CFF), skala od 0 do 100
+  // Plavi stubići sa slike (#4C8CFF), skala od 0 do 5
   const habitBars = [
-    { label: "Travel", value: 66, //averages?.travel || 66
+    { label: "Travel", value: averages?.travel || 0,
        color: "#4C8CFF" },
     {
       label: "Living and accomodation",
-      value:  66,// averages?.living || 66
+      value: averages?.living || 0,
       color: "#4C8CFF",
     },
     {
       label: "Food and consumption",
-      value: 26, //averages?.food || 26
+      value: averages?.consumption || 0,
       color: "#4C8CFF",
     },
     {
       label: "Digital habits",
-      value: 54, //averages?.digital || 54
+      value: averages?.digital || 0,
       color: "#4C8CFF",
     },
     {
       label: "Community engagement",
-      value:  54, //averages?.community || 54
+      value: averages?.engagement || 0,
       color: "#4C8CFF",
     },
   ];
 
-  const max = 100;
-  const ticks = [100, 80, 60, 40, 20, 0];
+  const max = 5;
+  const ticks = [5, 4, 3, 2, 1, 0];
 
   return (
     <div className="flex h-[320px] w-full min-w-0 flex-1 flex-col justify-between rounded-[12px] bg-white p-6 shadow-[0_0_20px_rgba(94,98,120,0.08)]">
@@ -155,7 +155,7 @@ export function SustainableHabits({ averages }: ChartProps) {
 
       {/* Grafikon */}
       <div className="flex flex-1 gap-3 pt-3 pb-8">
-        {/* Y-Osa (0-100) u ravni sa linijama */}
+        {/* Y-Osa (0-5) u ravni sa linijama */}
         <div className="relative flex w-8 flex-col justify-between text-right text-[11px] font-medium text-[#B5B5C3]">
           {ticks.map((t) => (
             <span key={t} className="transform -translate-y-1/2 leading-none">
@@ -241,12 +241,16 @@ function StatisticsPage() {
   </div>
 </section>
 
-      <StatisticsOverview data={dashboardData} isLoading={isLoading}/>
+      <StatisticsOverview
+        data={dashboardData}
+        isLoading={isLoading}
+        showStatisticsLink={false}
+      />
 
       <section className="bg-[#f5f5f5] py-10 pb-20">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-10 px-6 sm:px-10 lg:px-[160px] lg:flex-row lg:items-stretch">
           <SustainableBehaviour averages={dashboardData?.averages}  />
-          <SustainableHabits />
+          <SustainableHabits averages={dashboardData?.averages} />
         </div>
       </section>
 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
-import { fetchQuestions, submitSurvey } from "@/lib/api/questions";
+import { fetchQuestions, sendResultsEmail, submitSurvey } from "@/lib/api/questions";
 import { deriveMobilityDone } from "@/data/questions";
 import type { AnswerValue, Question, Submission } from "@/types/survey";
 
@@ -38,6 +38,7 @@ interface SurveyState {
   isCompleted: boolean;
   isRealAttempt: boolean | null;
   email: string;
+  benchmarkCode?: string;
   results?: SurveyResult;
 }
 
@@ -56,6 +57,7 @@ interface SurveyContextType {
   setIsRealAttempt: (value: boolean) => void;
   setEmail: (email: string) => void;
   completeSurvey: (overrides?: Partial<SurveyState>) => Promise<void>;
+  sendResultsEmail: (email: string) => Promise<void>;
   resetSurvey: () => void;
 
   /** Skor računa samo nad LIKERT pitanjima (1..5). */
@@ -131,6 +133,7 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
         ...prev,
         ...overrides,
         isCompleted: true,
+        benchmarkCode: response.benchmarkCode,
         // Backend vraća "result" (jednina) sa scores i feedback poljima
         results: response.result,
       }));
@@ -144,6 +147,12 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
   const resetSurvey = () => {
     sessionStorage.removeItem("surveyStartTime");
     setState(initialState);
+  };
+
+  const sendSurveyResultsEmail = async (email: string) => {
+    if (!state.benchmarkCode) throw new Error("Benchmark code is unavailable.");
+    await sendResultsEmail(state.benchmarkCode, email);
+    setState((prev) => ({ ...prev, email }));
   };
 
   // Ažurirani helperi koji čitaju iz nove 'scores' strukture
@@ -221,6 +230,7 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
         setIsRealAttempt,
         setEmail,
         completeSurvey,
+        sendResultsEmail: sendSurveyResultsEmail,
         resetSurvey,
         getScore,
         getCategoryScore,

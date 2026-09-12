@@ -44,7 +44,7 @@ export class EmailService {
     assignedBadge: string,
     assignedMessage: string,
     categorySuggestions: Record<string, string>,
-  ) {
+  ): Promise<boolean> {
     try {
       let categoriesHtml = '';
       const excludedCategories = [
@@ -194,8 +194,10 @@ export class EmailService {
 
       const info = await this.transporter.sendMail(mailOptions);
       this.logger.log(`Email successfully sent to ${to}`);
+      return true;
     } catch (error) {
       this.logger.error(`Error sending email to ${to}:`, error);
+      return false;
     }
   }
 }

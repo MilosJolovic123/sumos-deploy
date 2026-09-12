@@ -75,7 +75,13 @@ function CategoryGauge({
   );
 }
 
-export function DetailedResults() {
+export function DetailedResults({
+  showEmailAction = false,
+  onRequestEmail,
+}: {
+  showEmailAction?: boolean;
+  onRequestEmail?: () => void;
+}) {
   const { state } = useSurvey();
 
   const results = state.results;
@@ -115,7 +121,7 @@ export function DetailedResults() {
   }));
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0 pb-24 lg:pb-0">
       <section className="bg-background">
         <div className="mx-auto w-full max-w-[1440px] px-3 pb-12 pt-8 sm:px-6">
           <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-stretch lg:gap-[60px]">
@@ -176,6 +182,15 @@ export function DetailedResults() {
 
         </div>
       </section>
+      {showEmailAction && onRequestEmail && (
+        <button
+          type="button"
+          onClick={onRequestEmail}
+          className="fixed bottom-0 left-0 z-40 w-full rounded-none bg-brand-green px-6 py-4 text-lg font-bold text-white shadow-[0_-4px_18px_rgba(0,0,0,0.18)] transition-colors hover:bg-brand-green/90 lg:bottom-6 lg:left-auto lg:right-6 lg:w-auto lg:rounded-xl lg:px-8 lg:py-5"
+        >
+          Send results via email
+        </button>
+      )}
     </div>
   );
 }
