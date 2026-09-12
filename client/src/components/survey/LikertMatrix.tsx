@@ -30,15 +30,15 @@ export function LikertMatrix({
     <div className="space-y-4 py-4 border-b border-border/50 last:border-0">
       <p className="text-sm font-medium text-foreground">{questionText}</p>
       <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <thead>
             <tr className="text-muted-foreground">
               <th className="text-left font-normal pb-2"></th>
               {[1, 2, 3, 4, 5].map((n) => (
                 <th key={n} className="px-2 pb-2 text-center font-large align-top">
                   {n}
-                  {n === 1 && <div className="text-[10px] font-normal">{scaleLabels[0]}</div>}
-                  {n === 5 && <div className="text-[10px] font-normal">{scaleLabels[1]}</div>}
+                  {n === 1 && <div className="text-[11px] font-normal">{scaleLabels[0]}</div>}
+                  {n === 5 && <div className="text-[11px] font-normal">{scaleLabels[1]}</div>}
                 </th>
               ))}
             </tr>

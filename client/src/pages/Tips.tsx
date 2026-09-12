@@ -749,20 +749,20 @@ function TipsPage() {
       <Navigation />
 
       {/* Header Band */}
-      <section className="border-b border-[#E5E7EB] bg-white py-8">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 sm:px-10">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-[32px] font-bold tracking-tight text-[#1E2B4D] md:text-[38px]">
+      <section className="border-b border-[#E5E7EB] bg-white">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-10 sm:px-10 lg:px-[160px]">
+          <div className="flex flex-col gap-3">
+            <h1 className="font-gilroy text-[36px] font-bold tracking-tight text-[#233662] sm:text-[42px] md:text-[48px]">
               Check Tips &amp; Tricks
             </h1>
-            <p className="text-[15px] text-[#555555] md:text-[17px]">
+            <p className="font-gilroy text-[16px] font-medium text-[#444444] sm:text-[18px] md:text-[20px]">
               Discover simple tips &amp; tricks to improve your Green score and build more sustainable habits.
             </p>
           </div>
           <img
             src={sumosWordmark}
             alt="SuMoS"
-            className="hidden h-10 w-auto object-contain md:block"
+            className="hidden h-12 w-auto object-contain md:block"
           />
         </div>
       </section>
@@ -812,7 +812,7 @@ function TipsPage() {
               <span>HABITS</span>
             </button>
 
-            {/* COMMUNITY ENGAGEMENT */}
+            {/* COMMUNITY ENGAGEMENT
             <button
               onClick={() => setActiveCategory("community")}
               className={`flex items-center gap-2 rounded-full border px-5 py-2.5 text-[13px] font-bold tracking-wide transition-all ${
@@ -823,7 +823,7 @@ function TipsPage() {
             >
               <Users className="h-4 w-4 shrink-0" />
               <span>COMMUNITY ENGAGEMENT</span>
-            </button>
+            </button> */}
           </div>
 
           {/* List of Tips */}

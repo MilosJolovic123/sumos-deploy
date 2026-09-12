@@ -110,7 +110,7 @@ function Gauge({
   );
 }
 
-// --- Grafik 1: Sustainability Categories Comparison (0 - 5 scale) ---
+// --- Grafik 1: Sustainability Categories Comparison ---
 function DetailedCategoryComparison({
   filterScores,
   userScores,
@@ -128,15 +128,17 @@ function DetailedCategoryComparison({
   const ticks = [5, 4, 3, 2, 1, 0];
 
   return (
-    <div className="flex h-[340px] w-full flex-col justify-between rounded-[16px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
+    <div className="flex min-h-[340px] w-full min-w-0 flex-col justify-between rounded-[16px] border border-[#e5e7eb] bg-white p-4 sm:p-6 shadow-sm">
       <div className="flex flex-col gap-3">
-        <h3 className="text-[20px] font-bold text-[#1E2B4D]">Sustainability categories</h3>
-        <div  />
+        <h3 className="text-[18px] sm:text-[20px] font-bold text-[#1E2B4D]">
+          Sustainability categories
+        </h3>
+        <div />
       </div>
 
-      <div className="flex flex-1 gap-3 pt-3 pb-8">
+      <div className="flex flex-1 gap-2 sm:gap-3 pt-3 pb-12">
         {/* Y-Osa */}
-        <div className="relative flex w-6 flex-col justify-between text-right text-[11px] font-medium text-[#B5B5C3]">
+        <div className="relative flex w-5 sm:w-6 flex-col justify-between text-right text-[11px] font-medium text-[#B5B5C3]">
           {ticks.map((t) => (
             <span key={t} className="transform -translate-y-1/2 leading-none">
               {t}
@@ -145,36 +147,39 @@ function DetailedCategoryComparison({
         </div>
 
         {/* Mreža i stubići */}
-        <div className="relative flex flex-1 flex-col">
+        <div className="relative flex flex-1 flex-col min-w-0">
           <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 flex flex-col justify-between">
             {ticks.map((t) => (
               <div key={t} className="h-px w-full bg-[#F1F1F4]" />
             ))}
           </div>
 
-          <div className="relative flex h-full items-end justify-between px-4 sm:px-12">
+          <div className="relative flex h-full items-end justify-between px-1 sm:px-6">
             {categories.map((cat) => {
               const filterVal = filterScores[cat.key] || 0;
               const userVal = userScores[cat.key] || 0;
 
               return (
-                <div key={cat.key} className="relative flex h-full items-end justify-center gap-1.5 w-[70px]">
-                  {/* Tamnozeleni stubić (Prosek grupe) */}
+                <div
+                  key={cat.key}
+                  className="relative flex h-full flex-1 min-w-0 items-end justify-center gap-1 sm:gap-1.5"
+                >
+                  {/* Tamnozeleni stubić */}
                   <div
-                    className="w-[18px] sm:w-[22px] rounded-t-[4px] bg-[#1B432C] transition-all duration-700"
+                    className="w-full max-w-[18px] sm:max-w-[22px] rounded-t-[4px] bg-[#1B432C] transition-all duration-700"
                     style={{ height: `${(filterVal / max) * 100}%` }}
                     title={`Group average: ${filterVal}`}
                   />
-                  {/* Svetlozeleni stubić (Uneseni kod) */}
+                  {/* Svetlozeleni stubić */}
                   <div
-                    className="w-[18px] sm:w-[22px] rounded-t-[4px] bg-[#61A348] transition-all duration-700"
+                    className="w-full max-w-[18px] sm:max-w-[22px] rounded-t-[4px] bg-[#61A348] transition-all duration-700"
                     style={{ height: `${(userVal / max) * 100}%` }}
                     title={`Your score: ${userVal}`}
                   />
 
-                  {/* Labela ispod */}
-                  <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 w-[85px] h-10 flex items-center justify-center">
-                    <span className="font-gilroy font-normal text-center text-[12px] leading-tight text-[#464E5F]">
+                  {/* Responzivna labela ispod */}
+                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-full max-w-[80px] flex items-center justify-center">
+                    <span className="font-gilroy font-normal text-center text-[10px] sm:text-[12px] leading-tight text-[#464E5F] break-words">
                       {cat.label}
                     </span>
                   </div>
@@ -186,22 +191,21 @@ function DetailedCategoryComparison({
       </div>
 
       {/* Legenda */}
-      <div className="flex items-center justify-center gap-6 pt-2 my-2">
+      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-2">
         <div className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-sm bg-[#1B432C]" />
-          <span className="text-[12px] font-medium text-[#464E5F]">Filtered average</span>
-      
+          <span className="text-[11px] sm:text-[12px] font-medium text-[#464E5F]">Filtered average</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-sm bg-[#61A348]" />
-          <span className="text-[12px] font-medium text-[#464E5F]">Your score</span>
+          <span className="text-[11px] sm:text-[12px] font-medium text-[#464E5F]">Your score</span>
         </div>
       </div>
     </div>
   );
 }
 
-// --- Grafik 2: Sustainable Habits Comparison (Sada na skali 0 - 5) ---
+// --- Grafik 2: Sustainable Habits Comparison ---
 function DetailedHabitsComparison({
   filterScores,
   userScores,
@@ -220,15 +224,17 @@ function DetailedHabitsComparison({
   const ticks = [5, 4, 3, 2, 1, 0];
 
   return (
-    <div className="flex h-[340px] w-full flex-col justify-between rounded-[16px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
+    <div className="flex min-h-[340px] w-full min-w-0 flex-col justify-between rounded-[16px] border border-[#e5e7eb] bg-white p-4 sm:p-6 shadow-sm">
       <div className="flex flex-col gap-3">
-        <h3 className="text-[20px] font-bold text-[#1E2B4D]">Sustainable habits</h3>
-        <div/>
+        <h3 className="text-[18px] sm:text-[20px] font-bold text-[#1E2B4D]">
+          Sustainable habits
+        </h3>
+        <div className="h-px w-full bg-[#F1F1F4]" />
       </div>
 
-      <div className="flex flex-1 gap-3 pt-3 pb-8">
-        {/* Y-Osa (0 - 5) */}
-        <div className="relative flex w-6 flex-col justify-between text-right text-[11px] font-medium text-[#B5B5C3]">
+      <div className="flex flex-1 gap-2 sm:gap-3 pt-3 pb-12">
+        {/* Y-Osa */}
+        <div className="relative flex w-5 sm:w-6 flex-col justify-between text-right text-[11px] font-medium text-[#B5B5C3]">
           {ticks.map((t) => (
             <span key={t} className="transform -translate-y-1/2 leading-none">
               {t}
@@ -237,36 +243,39 @@ function DetailedHabitsComparison({
         </div>
 
         {/* Mreža i stubići */}
-        <div className="relative flex flex-1 flex-col">
+        <div className="relative flex flex-1 flex-col min-w-0">
           <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 flex flex-col justify-between">
             {ticks.map((t) => (
               <div key={t} className="h-px w-full bg-[#F1F1F4]" />
             ))}
           </div>
 
-          <div className="relative flex h-full items-end justify-between px-2 sm:px-6">
+          <div className="relative flex h-full items-end justify-between px-1 sm:px-4">
             {habits.map((item) => {
               const filterVal = filterScores[item.key] || 0;
               const userVal = userScores[item.key] || 0;
 
               return (
-                <div key={item.key} className="relative flex h-full items-end justify-center gap-1.5 w-[70px]">
-                  {/* Tamnoplavi stubić (Prosek grupe) */}
+                <div
+                  key={item.key}
+                  className="relative flex h-full flex-1 min-w-0 items-end justify-center gap-1 sm:gap-1.5"
+                >
+                  {/* Tamnoplavi stubić */}
                   <div
-                    className="w-[16px] sm:w-[18px] rounded-t-[4px] bg-[#172545] transition-all duration-700"
+                    className="w-full max-w-[14px] sm:max-w-[18px] rounded-t-[4px] bg-[#172545] transition-all duration-700"
                     style={{ height: `${(filterVal / max) * 100}%` }}
                     title={`Group average: ${filterVal}`}
                   />
-                  {/* Svetloplavi stubić (Uneseni kod) */}
+                  {/* Svetloplavi stubić */}
                   <div
-                    className="w-[16px] sm:w-[18px] rounded-t-[4px] bg-[#4C8CFF] transition-all duration-700"
+                    className="w-full max-w-[14px] sm:max-w-[18px] rounded-t-[4px] bg-[#4C8CFF] transition-all duration-700"
                     style={{ height: `${(userVal / max) * 100}%` }}
                     title={`Your score: ${userVal}`}
                   />
 
-                  {/* Labela ispod */}
-                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-[90px] h-10 flex items-center justify-center">
-                    <span className="font-gilroy font-normal text-center text-[11px] leading-tight text-[#464E5F]">
+                  {/* Responzivna labela ispod */}
+                  <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-full max-w-[75px] sm:max-w-[90px] flex items-center justify-center">
+                    <span className="font-gilroy font-normal text-center text-[9px] sm:text-[11px] leading-tight text-[#464E5F] break-words">
                       {item.label}
                     </span>
                   </div>
@@ -278,15 +287,14 @@ function DetailedHabitsComparison({
       </div>
 
       {/* Legenda */}
-      <div className="flex items-center justify-center gap-6 pt-2 my-2">
+      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-2">
         <div className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-sm bg-[#172545]" />
-          <span className="text-[12px] font-medium text-[#464E5F]">Filtered average</span>
-          
+          <span className="text-[11px] sm:text-[12px] font-medium text-[#464E5F]">Filtered average</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-sm bg-[#4C8CFF]" />
-          <span className="text-[12px] font-medium text-[#464E5F]">Your score</span>
+          <span className="text-[11px] sm:text-[12px] font-medium text-[#464E5F]">Your score</span>
         </div>
       </div>
     </div>
@@ -550,7 +558,7 @@ function BenchmarkPage() {
 
             <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center">
               <div className="flex flex-col">
-                <label className="text-[12px] font-semibold text-[#444444]">
+                <label className="text-[14px] font-semibold text-[#444444]">
                   Your single-code:
                 </label>
                 <input
@@ -584,7 +592,7 @@ function BenchmarkPage() {
                 {appliedFilters.map((filter) => (
                   <span
                     key={filter.id}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#F1F5F9] px-3 py-1.5 text-[13px] font-medium text-[#233662]"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#F1F5F9] px-3 py-1.5 text-[14px] font-medium text-[#233662]"
                   >
                     {filter.label}
                     <button
@@ -601,7 +609,7 @@ function BenchmarkPage() {
             {appliedFilters.length > 0 && (
               <button
                 onClick={clearAllFilters}
-                className="text-[13px] font-semibold text-[#233662] underline underline-offset-2 transition-colors hover:text-[#61A348]"
+                className="text-[14px] font-semibold text-[#233662] underline underline-offset-2 transition-colors hover:text-[#61A348]"
               >
                 Clear filters
               </button>
@@ -616,7 +624,7 @@ function BenchmarkPage() {
               <div className="flex flex-col gap-4">
                 {/* 1. Mobility status */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-[#444444]">
+                  <label className="text-[14px] font-semibold text-[#444444]">
                     Mobility status
                   </label>
                   <div className="relative">
@@ -635,7 +643,7 @@ function BenchmarkPage() {
 
                 {/* 2. Country */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-[#444444]">
+                  <label className="text-[14px] font-semibold text-[#444444]">
                     Country
                   </label>
                   <div className="relative">
@@ -655,7 +663,7 @@ function BenchmarkPage() {
 
                 {/* 3. Institution */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-[#444444]">
+                  <label className="text-[14px] font-semibold text-[#444444]">
                     Institution
                   </label>
                   <div className="relative">
