@@ -717,17 +717,56 @@ const tipsData: Record<
     ],
   },
   community: {
-    default: [
-      {
-        sectionTitle: "Community Engagement",
-        items: [
-          {
-            text: "Engage with local environmental groups and participate in community sustainability projects.",
-          },
-        ],
-      },
-    ],
-  },
+  default: [
+    {
+      sectionTitle: "Here’s what you can do during your mobility while you’re at the host institution:",
+      items: [
+        {
+          text: "Try volunteering in sustainability initiatives organized by your host university (such as zero-waste events, campus clean-up days, urban gardening projects). This will not only help our environment but also help you meet new people and make connections!",
+        },
+        {
+          text: "Try joining or attending meetings of the host city's environmental or community groups – even going only once is a valuable cross-cultural experience and a great start!",
+        },
+        {
+          text: "Try participating in local food-sharing, repair cafés, or swap events instead of buying new items during your stay. You never know the hidden gems you might find this way!",
+        },
+      ],
+    },
+    {
+      sectionTitle: "You are already an influencer! Here is how you can help your community:",
+      items: [
+        {
+          text: "Try sharing your sustainability practices with fellow exchange students and initiate \"green habits\" discussions in your student residence or accommodation. Post your ideas on your social media and talk with your friends. You might make new friends along the way, and you never know who you will inspire along the way!",
+        },
+        {
+          text: "Try encouraging your home and host university student unions to adopt or strengthen green mobility policies. Be the change you want to see, and you can be the voice for the environment!",
+        },
+      ],
+    },
+    {
+      sectionTitle: "Here’s how you can boost your environmental engagement:",
+      items: [
+        {
+          text: "Try following and engaging with your host country's environmental NGOs on social media to stay informed and amplify their messages. A share, a like, a repost or a comment helps a lot!",
+        },
+        {
+          text: "Try documenting and sharing your green mobility experience on the SuMoS platform or social media to inspire other mobile students. Just a few words or tips from you might mean a lot to someone just starting out!",
+        },
+      ],
+    },
+    {
+      sectionTitle: "Here’s how you can bring back your mobility experience home:",
+      items: [
+        {
+          text: "After returning, present what you learned about sustainability practices in your host country to your home university community. You would be surprised by the positive reactions you might get from your university!",
+        },
+        {
+          text: "Propose the adoption of a green practice you observed abroad to your home institution's student union or administration. Somebody needs to be the first to start – so why not you?",
+        },
+      ],
+    },
+  ],
+},
 };
 
 function TipsPage() {
@@ -812,18 +851,18 @@ function TipsPage() {
               <span>HABITS</span>
             </button>
 
-            {/* COMMUNITY ENGAGEMENT
+            {/* COMMUNITY ENGAGEMENT */}
             <button
-              onClick={() => setActiveCategory("community")}
+             onClick={() => setActiveCategory("community")}
               className={`flex items-center gap-2 rounded-full border px-5 py-2.5 text-[13px] font-bold tracking-wide transition-all ${
                 activeCategory === "community"
                   ? "border-[#65AD55] bg-[#65AD55] text-white shadow-sm"
-                  : "border-[#D0D0D0] bg-white text-[#4A4A4A] hover:border-[#65AD55]"
-              }`}
+                   : "border-[#D0D0D0] bg-white text-[#4A4A4A] hover:border-[#65AD55]"
+               }`}
             >
-              <Users className="h-4 w-4 shrink-0" />
-              <span>COMMUNITY ENGAGEMENT</span>
-            </button> */}
+            <Users className="h-4 w-4 shrink-0" />
+            <span>COMMUNITY ENGAGEMENT</span>
+            </button>
           </div>
 
           {/* List of Tips */}
