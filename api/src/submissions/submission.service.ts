@@ -172,7 +172,7 @@ export class SubmissionsService {
       durationMs: parsedDurationMs,
       startedAt: startedAtDate,
       finishedAt: finishedAtDate,
-      completionTimeSeconds: completionTimeSeconds || Math.round(parsedDurationMs / 1000),
+      completionTimeSeconds: completionTimeSeconds ?? Math.round(parsedDurationMs / 1000),
       state: newSubmission.state,
       institution: institutionMapValue,
     });

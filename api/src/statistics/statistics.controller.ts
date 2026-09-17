@@ -17,7 +17,9 @@ export class StatisticsController {
     const averageCompletionTimeMs = await this.statisticsService.getAverageCompletionTimeMs();
     return {
       averageCompletionTimeMs,
-      averageCompletionTimeSeconds: averageCompletionTimeMs / 1000,
+      averageCompletionTimeSeconds: this.statisticsService.toSeconds(
+        averageCompletionTimeMs,
+      ),
     };
   }
 
