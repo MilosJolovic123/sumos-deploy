@@ -14,7 +14,13 @@ export class StatisticsService {
     const allResults = await this.resultModel
       .find(
         { isRealAttempt: true },
-        { ecoScore: 1, categoryScores: 1, badge: 1, durationMs: 1, completionTimeSeconds: 1 },
+        {
+          ecoScore: 1,
+          categoryScores: 1,
+          badge: 1,
+          durationMs: 1,
+          completionTimeSeconds: 1,
+        },
       )
       .lean()
       .exec();
@@ -25,7 +31,8 @@ export class StatisticsService {
     }
 
     const totalSurveys = allResults.length;
-    const averageCompletionTimeMs = this.calculateAverageCompletionTimeMs(allResults);
+    const averageCompletionTimeMs =
+      this.calculateAverageCompletionTimeMs(allResults);
 
     // Zbirovi za proseke
     let ecoSum = 0;
@@ -93,7 +100,7 @@ export class StatisticsService {
       totalSurveys,
       mostPopularBadge,
       averageCompletionTimeMs,
-      averageCompletionTimeSeconds: this.round(averageCompletionTimeMs / 1000),
+      averageCompletionTimeSeconds: this.toSeconds(averageCompletionTimeMs),
       averages: {
         ecoScore: this.round(ecoSum / totalSurveys),
         awareness: this.round(awarenessSum / totalSurveys),
@@ -129,17 +136,19 @@ export class StatisticsService {
 
   async getCountryScores() {
     const results = await this.resultModel
-      .find(
-        { isRealAttempt: true },
-        { state: 1, ecoScore: 1 },
-      )
+      .find({ isRealAttempt: true }, { state: 1, ecoScore: 1 })
       .lean()
       .exec();
 
     const byCountry = new Map<string, { sum: number; count: number }>();
     for (const result of results) {
-      const country = typeof result.state === 'string' ? result.state.trim() : '';
-      if (!country || typeof result.ecoScore !== 'number' || !Number.isFinite(result.ecoScore)) {
+      const country =
+        typeof result.state === 'string' ? result.state.trim() : '';
+      if (
+        !country ||
+        typeof result.ecoScore !== 'number' ||
+        !Number.isFinite(result.ecoScore)
+      ) {
         continue;
       }
 
@@ -155,7 +164,12 @@ export class StatisticsService {
         score: this.round(values.sum / values.count),
         count: values.count,
       }))
-      .sort((a, b) => b.score - a.score || b.count - a.count || a.country.localeCompare(b.country));
+      .sort(
+        (a, b) =>
+          b.score - a.score ||
+          b.count - a.count ||
+          a.country.localeCompare(b.country),
+      );
   }
 
   // --- Pomoćne metode ---
@@ -163,28 +177,34 @@ export class StatisticsService {
   private calculateAverageCompletionTimeMs(results: any[]): number {
     const values = results
       .map((result) => {
-        if (typeof result.durationMs === 'number' && Number.isFinite(result.durationMs)) {
-          return Math.max(0, result.durationMs);
+        if (
+          typeof result.durationMs === 'number' &&
+          Number.isFinite(result.durationMs) &&
+          result.durationMs > 0
+        ) {
+          return result.durationMs;
         }
         if (
           typeof result.completionTimeSeconds === 'number' &&
-          Number.isFinite(result.completionTimeSeconds)
+          Number.isFinite(result.completionTimeSeconds) &&
+          result.completionTimeSeconds > 0
         ) {
-          return Math.max(0, result.completionTimeSeconds * 1000);
+          return result.completionTimeSeconds * 1000;
         }
         return null;
       })
-      .filter((value): value is number => value !== null && value >= 0);
+      .filter((value): value is number => value !== null);
 
-    if (values.length === 0) {
-      return 0;
-    }
-
+    if (values.length === 0) return 0;
     return values.reduce((sum, value) => sum + value, 0) / values.length;
   }
 
   private round(value: number): number {
     return value ? parseFloat(value.toFixed(2)) : 0;
+  }
+
+  toSeconds(ms: number): number {
+    return this.round(ms / 1000);
   }
 
   // Fallback kad nema podataka (sve na engleskom)
