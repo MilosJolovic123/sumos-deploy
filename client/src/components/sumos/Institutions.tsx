@@ -6,14 +6,23 @@ import logoFon from "@/assets/logo-fon.png";
 
 const items = [
   { name: "FOI", src: logoFoi, href: "/documents/FOI_GREEN_Dokument_A4_v2.pdf" },
-  { name: "ESIEA", src: logoEsiea, href: "/documents/Catalogue_of_Green_Practices_ESIEA_Sept2026.pdf" },
+  {
+    name: "ESIEA",
+    src: logoEsiea,
+    href: "/documents/Catalogue_of_Green_Practices_ESIEA_Sept2026.pdf",
+  },
   { name: "University of Žilina", src: logoZilina, href: "/documents/zilina-green-practices.pdf" },
   {
     name: "University of Maribor",
     src: logoMaribor,
     href: "/documents/03_Catalogue_of_Green_Practices_UM_FOV.pdf",
   },
-  { name: "FON Belgrade", src: logoFon, href: "/documents/fon-green-practices.pdf" },
+  {
+    name: "FON Belgrade",
+    src: logoFon,
+    href: "/documents/Catalogue_of_Green_Practices_UB_FON_new_version.pdf",
+
+  },
 ];
 
 export function Institutions() {
