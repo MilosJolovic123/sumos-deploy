@@ -41,9 +41,10 @@ export function Footer() {
             Contact
           </a>
           <a
-            href="/privacy"
+            href="/privacy-policy"
             className="transition-colors hover:text-[#518EFA]"
             target="_blank"
+            rel="noopener noreferrer"
           >
             Terms of service and privacy notice
           </a>

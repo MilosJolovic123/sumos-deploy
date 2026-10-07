@@ -346,7 +346,17 @@ function BenchmarkPage() {
   // Podaci za Uneseni Kod Korisnika (0 - 5 skala za sve kategorije)
   const [userData, setUserData] = useState<UserData>({
     ecoScore: 0,
-    categoryScores: {},
+    categoryScores: {
+      Awareness: 0,
+      Attitudes: 0,
+      Travel: 0,
+      Living: 0,
+      Consumption: 0,
+      Digital: 0,
+      Engagement: 0,
+      Barriers: 0,
+      Habits: 0,
+    },
   });
 
   const API_HOST = import.meta.env.VITE_API_HOST || "";
@@ -584,7 +594,7 @@ function BenchmarkPage() {
               Benchmark
             </h1>
             <p className="font-gilroy text-[16px] font-medium text-[#444444] sm:text-[18px] md:text-[20px]">
-              Compare your results with others via a unique code, sent by you through email.
+              Compare your results with others via a unique code, sent to you through email.
             </p>
           </div>
 

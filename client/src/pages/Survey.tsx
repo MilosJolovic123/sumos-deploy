@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { BadgeDisplay } from "@/components/shared/BadgeDisplay";
 import { QuestionRenderer } from "@/components/survey/QuestionRenderer";
 import { useSurvey } from "@/contexts/SurveyContext";
 import { Button } from "@/components/ui/button";
@@ -17,10 +16,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
-  ArrowRight,
-  Eye,
-  BarChart3,
-  Lightbulb,
   Sun,
   MessageSquare,
   Settings,
@@ -30,17 +25,8 @@ import {
   Plane,
   Globe2,
 } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import type { Question } from "@/types/survey";
 import { toast } from "sonner";
@@ -214,7 +200,7 @@ export default function SurveyPage() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showBeforeFinish, setShowBeforeFinish] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-  const [errorKey, setErrorKey] = useState<string | null>(null);
+  const [errorKeys, setErrorKeys] = useState<string[]>([]);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -276,68 +262,74 @@ export default function SurveyPage() {
 
   const currentGroup = groups[groupIdx];
   const currentSub = currentGroup?.subSteps[subIdx];
-  const currentQuestions = currentSub?.questions ?? [];
+  const isSinglePageGroup = currentGroup?.key === "BARRIERS";
+  const visibleSubSteps = isSinglePageGroup
+    ? (currentGroup?.subSteps ?? [])
+    : currentSub
+      ? [currentSub]
+      : [];
 
   const isLastSub = currentGroup ? subIdx === currentGroup.subSteps.length - 1 : true;
+  const isLastVisibleSub = isSinglePageGroup || isLastSub;
   const isLastGroup = groupIdx === groups.length - 1;
 
-  const globalValidate = () => {
+  const getMissingRequiredQuestions = () => {
+    const missing: { gIdx: number; sIdx: number; key: string }[] = [];
     for (let gIdx = 0; gIdx < groups.length; gIdx++) {
       const group = groups[gIdx];
       for (let sIdx = 0; sIdx < group.subSteps.length; sIdx++) {
         const sub = group.subSteps[sIdx];
         for (const q of sub.questions) {
           if (isQuestionRequired(q, mobilityDone) && !getQuestionStatus(q, state.answers)) {
-            return { gIdx, sIdx, key: q.key };
+            missing.push({ gIdx, sIdx, key: q.key });
           }
         }
       }
     }
-    return null;
+    return missing;
   };
-
-  const surveyReadyToFinish = progress === 100 && globalValidate() === null;
 
   //uvek na top
   useEffect(() => {
-    if (!errorKey) {
+    if (errorKeys.length === 0) {
       window.scrollTo({
         top: 0,
         left: 0,
         behavior: "smooth",
       });
     }
-  }, [groupIdx, subIdx, errorKey]);
+  }, [groupIdx, subIdx, errorKeys.length]);
 
   const goNext = () => {
-    const isFinalVisibleStep = isLastGroup && isLastSub;
-    const errorLoc = isFinalVisibleStep ? globalValidate() : null;
+    const isFinalVisibleStep = isLastGroup && isLastVisibleSub;
 
-    if (isFinalVisibleStep && progress === 100) {
-      if (errorLoc) {
+    if (isFinalVisibleStep) {
+      const missingQuestions = getMissingRequiredQuestions();
+      if (missingQuestions.length > 0) {
+        const firstMissing = missingQuestions[0];
         toast.error("Missing answers", {
-          description: "Please answer all mandatory questions. We've highlighted the missing one.",
+          description:
+            "Please answer all mandatory questions. We've highlighted the missing questions.",
           duration: 4000,
         });
-        setGroupIdx(errorLoc.gIdx);
-        setSubIdx(errorLoc.sIdx);
-        setErrorKey(errorLoc.key);
+        setGroupIdx(firstMissing.gIdx);
+        setSubIdx(firstMissing.sIdx);
+        setErrorKeys(missingQuestions.map(({ key }) => key));
         setTimeout(() => {
           document
-            .getElementById(`question-${errorLoc.key}`)
+            .getElementById(`question-${firstMissing.key}`)
             ?.scrollIntoView({ behavior: "smooth", block: "center" });
         }, 150);
         return;
       }
 
-      setErrorKey(null);
+      setErrorKeys([]);
       setCurrentStep(1);
       setShowBeforeFinish(true);
       return;
     }
 
-    setErrorKey(null);
-    if (currentGroup && !isLastSub) {
+    if (currentGroup && !isLastVisibleSub) {
       setSubIdx(subIdx + 1);
       return;
     }
@@ -347,15 +339,13 @@ export default function SurveyPage() {
       return;
     }
   };
-
   const goBack = () => {
-    setErrorKey(null);
-    if (subIdx > 0) {
+    if (!isSinglePageGroup && subIdx > 0) {
       setSubIdx(subIdx - 1);
     } else if (groupIdx > 0) {
       const prev = groups[groupIdx - 1];
       setGroupIdx(groupIdx - 1);
-      setSubIdx(prev.subSteps.length - 1);
+      setSubIdx(prev.key === "BARRIERS" ? 0 : prev.subSteps.length - 1);
     } else {
       setHasConsented(false);
     }
@@ -399,7 +389,7 @@ export default function SurveyPage() {
         }
       }
     }
-    setErrorKey(null);
+    setErrorKeys([]);
     toast.success("Survey filled with random answers");
   };
 
@@ -474,11 +464,14 @@ export default function SurveyPage() {
   //Ovde treba hendlovati logiku odgovora i bedz koji je dobio - tu treba prosiriti model dodatno moramo da vidimo kako ce se vracati rezultati
   //I gde ce se zapravo cuvati bedz - da li ima smisla perzistirati ga ili ga racunati svaki put naknadno
 
-  const headerTitle = currentStep === 2 ? "View detailed result" : "Take the Green survey";
-
+  const headerTitle = currentStep === 2 ? "View detailed results" : "Take the green survey";
+  const headerSubtitle = currentStep === 2 ? "Discover your overall Green score, explore your results by category, and find recommendations for improvement. For practical tips and advice, check out Tips and Tricks.":"Discover your Green profile based on your awareness, attitudes, and sustainable habits." ;
   return (
     <Layout>
-      <PageHeader title={headerTitle} subtitle="Take the Green survey and discover your Green profile based on your awareness, attitudes, and sustainable habits." />
+      <PageHeader
+        title={headerTitle}
+        subtitle={headerSubtitle}
+      />
 
       <div className={cn("w-full", currentStep === 2 ? "py-0" : "px-4 py-8")}>
         <div className={cn("relative w-full", currentStep === 2 ? "" : "mx-auto max-w-5xl")}>
@@ -495,7 +488,6 @@ export default function SurveyPage() {
                     <button
                       key={item.q.key}
                       onClick={() => {
-                        setErrorKey(null);
                         setGroupIdx(item.gIdx);
                         setSubIdx(item.sIdx);
                         setTimeout(() => {
@@ -563,7 +555,6 @@ export default function SurveyPage() {
                               <button
                                 key={g.key}
                                 onClick={() => {
-                                  setErrorKey(null);
                                   setGroupIdx(i);
                                   setSubIdx(0);
                                 }}
@@ -580,7 +571,7 @@ export default function SurveyPage() {
                         </div>
 
                         {/* Pod-koraci */}
-                        {currentGroup && currentGroup.subSteps.length > 1 && (
+                        {currentGroup && currentGroup.subSteps.length > 1 && !isSinglePageGroup && (
                           <div className="flex items-start justify-center gap-0 py-4 flex-nowrap w-full overflow-x-auto">
                             {currentGroup.subSteps.map((sub, i) => {
                               const subStatus = getSubStatus(sub, state.answers, mobilityDone);
@@ -589,7 +580,6 @@ export default function SurveyPage() {
                                 <div key={sub.category} className="flex items-start">
                                   <button
                                     onClick={() => {
-                                      setErrorKey(null);
                                       setSubIdx(i);
                                     }}
                                     className="flex w-[110px] flex-col items-center gap-2"
@@ -629,35 +619,62 @@ export default function SurveyPage() {
                         )}
 
                         {/* Pitanja */}
-                        <div className="rounded-lg border bg-card p-6 space-y-2">
-                          {currentSub && (
-                            <div className="mb-2 border-b border-border pb-3">
-                              <h3 className="text-base font-bold text-foreground">
-                                {currentSub.category}
-                              </h3>
-                            </div>
-                          )}
-                          {currentQuestions.map((q) => (
-                            <div
-                              key={q.key}
-                              id={`question-${q.key}`}
-                              className={cn(
-                                "transition-all duration-300",
-                                errorKey === q.key
-                                  ? "ring-2 ring-destructive ring-offset-2 p-3 bg-destructive/5 rounded-xl"
-                                  : "",
-                              )}
-                            >
-                              <QuestionRenderer
-                                question={q}
-                                value={state.answers[q.key]}
-                                onChange={(v) => {
-                                  if (errorKey === q.key) setErrorKey(null);
-                                  setAnswer(q.key, v);
-                                }}
-                              />
-                            </div>
-                          ))}
+                        <div className="rounded-lg border bg-card p-6">
+                          <div className="space-y-6">
+                            {visibleSubSteps.map((sub) => (
+                              <section key={sub.category}>
+                                <div
+                                  className={cn(
+                                    "mb-2 border-b pb-3",
+                                    isSinglePageGroup ? "border-brand-green" : "border-border",
+                                  )}
+                                >
+                                  <h3
+                                    className={cn(
+                                      "font-bold text-foreground",
+                                      isSinglePageGroup
+                                        ? "text-lg text-brand-blue-deep"
+                                        : "text-base",
+                                    )}
+                                  >
+                                    {sub.category}
+                                  </h3>
+                                </div>
+                                <div className="space-y-2">
+                                  {sub.questions.map((q) => (
+                                    <div
+                                      key={q.key}
+                                      id={`question-${q.key}`}
+                                      className={cn(
+                                        "transition-all duration-300",
+                                        errorKeys.includes(q.key)
+                                          ? "rounded-xl bg-destructive/5 p-3 ring-2 ring-destructive ring-offset-2"
+                                          : "",
+                                      )}
+                                    >
+                                      <QuestionRenderer
+                                        question={q}
+                                        value={state.answers[q.key]}
+                                        onChange={(v) => {
+                                          if (
+                                            getQuestionStatus(q, {
+                                              ...state.answers,
+                                              [q.key]: v,
+                                            })
+                                          ) {
+                                            setErrorKeys((keys) =>
+                                              keys.filter((key) => key !== q.key),
+                                            );
+                                          }
+                                          setAnswer(q.key, v);
+                                        }}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              </section>
+                            ))}
+                          </div>
                         </div>
 
                         {/* Bottom nav */}
@@ -683,11 +700,10 @@ export default function SurveyPage() {
                             </Button>
                             <span className="text-base font-bold text-foreground">{progress}%</span>
                             <Button
-                              className="rounded-full bg-brand-green px-8 text-white hover:bg-brand-green/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="rounded-full bg-brand-green px-8 text-white hover:bg-brand-green/90"
                               onClick={goNext}
-                              disabled={isLastGroup && isLastSub ? !surveyReadyToFinish : false}
                             >
-                              {isLastGroup && isLastSub ? "Finish" : "Next"}
+                              {isLastGroup && isLastVisibleSub ? "Finish" : "Next"}
                             </Button>
                           </div>
                           <Progress value={progress} className="h-2" />

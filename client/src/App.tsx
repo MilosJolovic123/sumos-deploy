@@ -5,6 +5,7 @@ import Benchmark from "./pages/Benchmark";
 import Statistics from "./pages/Statistics";
 import Tips from "./pages/Tips";
 import Survey from "./pages/Survey";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 
 function NotFound() {
@@ -55,6 +56,7 @@ export default function App() {
         
         <Route path="/survey/tips" element={<Tips />} />
         <Route path="*" element={<NotFound />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
     </>
   );
