@@ -52,7 +52,7 @@ function CategoryGauge({
 
   return (
     <div className="flex h-[288px] w-[360px] shrink-0 flex-col items-center justify-between rounded-[12px] bg-white px-6 pb-6 pt-8 shadow-[0_0_20px_rgba(94,98,120,0.08)]">
-      <h3 className="text-center text-[20px] font-semibold" style={{ color }}>
+      <h3 className="text-center text-[22px] font-bold text-sumos-blue-300">
         {name}
       </h3>
       <div className="flex flex-col items-center">
@@ -148,7 +148,7 @@ export function DetailedResults({
               </div>
               <div className="flex justify-end">
                 <Link to="/tips" className="inline-flex items-center gap-1 rounded-lg px-6 py-3 text-base font-medium text-sumos-blue-100 hover:underline">
-                  View suggestions <ArrowRight className="h-5 w-5" />
+                  View all suggestions <ArrowRight className="h-5 w-5" />
                 </Link>
               </div>
             </div>
@@ -165,7 +165,6 @@ export function DetailedResults({
               <div key={cat.name} className="flex w-full flex-col items-center gap-10 md:flex-row md:items-center">
                 <CategoryGauge name={cat.name} value={cat.value} />
                 <div className="flex-1 space-y-4 py-6">
-                  <h4 className="text-2xl font-semibold text-sumos-blue-300">Suggestion</h4>
                   {cat.bullets.length > 0 ? (
                     <ul className="list-disc space-y-1 pl-6 text-base leading-relaxed text-sumos-blue-200">
                       {cat.bullets.map((b, i) => (

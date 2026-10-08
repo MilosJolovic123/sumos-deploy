@@ -5,7 +5,7 @@ import logoMaribor from "@/assets/logo-maribor.png";
 import logoFon from "@/assets/logo-fon.png";
 
 const items = [
-  { name: "FOI", src: logoFoi, href: "/documents/FOI_GREEN_Dokument_A4_v2.pdf" },
+  { name: "FOI", src: logoFoi, href: "/documents/FOI_GREEN_Dokument_A4_v3.pdf" },
   {
     name: "ESIEA",
     src: logoEsiea,

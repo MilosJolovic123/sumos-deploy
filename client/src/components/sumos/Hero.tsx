@@ -34,12 +34,27 @@ export function Hero() {
               <p className="max-w-[602px] text-[18px] leading-[26px] text-[#444444]">
                 Take the survey, benchmark your results against other students, and check tips&tricks to become more sustainable!{" "}
               </p>
-              <a
-                href="/survey"
-                className="inline-flex items-center gap-1 rounded-lg bg-[#518efa] px-6 py-3 text-[16px] font-medium text-white transition-transform hover:-translate-y-0.5"
-              >
-                Take a survey <ArrowRight className="h-6 w-6" />
-              </a>
+              <div className="flex flex-col items-start gap-2">
+                <a
+                  href="/survey"
+                  className="inline-flex items-center gap-1 rounded-lg bg-[#518efa] px-6 py-3 text-[16px] font-medium text-white transition-transform hover:-translate-y-0.5"
+                >
+                  Take a survey <ArrowRight className="h-6 w-6" />
+                </a>
+                <p className="text-sm text-[#444444]">
+                  By using this site, you agree to the{" "}
+                  <a
+                    href="/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Terms of Use (page not available yet)"
+                    className="font-medium text-[#518efa] underline underline-offset-2"
+                  >
+                    Terms of Use
+                  </a>
+                  .
+                </p>
+              </div>
             </div>
           </div>
         </div>

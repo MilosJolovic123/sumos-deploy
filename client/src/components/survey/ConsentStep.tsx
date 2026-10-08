@@ -25,7 +25,7 @@ export default function ConsentStep({
             Survey Terminated
           </h2>
           <p className="text-muted-foreground">
-            You have chosen not to provide consent. You will be redirected to
+            You have chosen not to agree with the Terms of Service. You will be redirected to
             the homepage shortly.
           </p>
           <div className="mt-6 flex justify-center">
@@ -45,11 +45,10 @@ export default function ConsentStep({
           <Shield className="h-6 w-6 text-primary shrink-0 mt-1" />
           <div className="space-y-2">
             <h2 className="text-xl font-bold text-foreground">
-              Informed Consent
+              Agreement with Terms of Service
             </h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              By participating in the survey, I consent to my anonymous
-              responses being used for research purposes.
+              By participating in the survey, I agree with the Terms of Service
             </p>
           </div>
         </div>
@@ -92,7 +91,12 @@ export default function ConsentStep({
 
         <div className="mt-8 flex justify-end">
           <Button
-            className="rounded-full bg-secondary px-8 text-secondary-foreground hover:bg-secondary/90"
+            className={cn(
+              "rounded-full px-8",
+              value
+                ? "bg-brand-green text-white hover:bg-brand-green/90"
+                : "bg-muted text-muted-foreground",
+            )}
             disabled={!value}
             onClick={() => {
               if (value === "agree") {
